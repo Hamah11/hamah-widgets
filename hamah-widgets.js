@@ -43,7 +43,8 @@
     skipPaths: ['/cart','/checkout','/payment','/thank','/orders','/account','/auth'],
     showName: false,                  // false = الكل يظهر «فاعل خير» (الأكثر أماناً). true = الاسم الأول إن وُجد
     hideAmount: false,
-    show: 4, rotateMs: 3500, refreshMs: 60000,
+    show: 5, rotateMs: 3500, refreshMs: 60000,
+    minAmount: 20, urgentWord: 'عاجل', timeMaxMin: 60,
     maxAgeHours: 72, fallback: true, fallbackDays: 90,
     toastFirst: 6000, toastEvery: 20000, toastStay: 6000, toastMax: 5
   };
@@ -88,7 +89,7 @@
 .hm-pulse{width:10px;height:10px;border-radius:50%;background:#2ecc71;position:relative}\
 .hm-pulse::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:2px solid #2ecc71;animation:hmPulse 1.6s infinite}\
 @keyframes hmPulse{0%{transform:scale(.5);opacity:1}100%{transform:scale(1.4);opacity:0}}\
-.hm-live-list{display:flex;flex-direction:column;gap:10px;height:216px;overflow:hidden}\
+.hm-live-list{display:flex;flex-direction:column;gap:10px;overflow:hidden}\
 .hm-live-item{display:flex;align-items:center;gap:14px;background:#fff;border-radius:14px;padding:12px 16px;box-shadow:0 3px 12px rgba(0,0,0,.05);animation:hmIn .6s cubic-bezier(.2,.8,.2,1) both}\
 @keyframes hmIn{from{opacity:0;transform:translateY(-18px)}to{opacity:1;transform:none}}\
 .hm-live-av{width:42px;height:42px;border-radius:50%;background:var(--c);color:#fff;display:grid;place-items:center;font-size:18px;flex:0 0 42px}\
@@ -97,7 +98,7 @@
 .hm-live-cta{text-align:center;margin-top:18px}\
 .hm-live-cta a{display:inline-block;background:var(--c);color:#fff;text-decoration:none;padding:12px 32px;border-radius:40px;font-size:16px;transition:.3s}\
 .hm-live-empty{color:#777;text-align:center;padding:30px 0;font-size:15px}\
-@media(max-width:600px){.hm-live-item{flex-wrap:wrap}.hm-live-time{width:100%;margin:4px 0 0;text-align:left}.hm-live-list{height:auto;max-height:260px}}\
+@media(max-width:600px){.hm-live-item{flex-wrap:wrap}.hm-live-time{width:100%;margin:4px 0 0;text-align:left}}\
 .hm-toast{position:fixed;bottom:24px;left:24px;z-index:99999;direction:rtl;font-family:'+CFG.font+';display:flex;align-items:center;gap:14px;background:#fff;border-radius:18px;padding:14px 18px 14px 22px;min-width:300px;max-width:min(420px,calc(100vw - 48px));box-shadow:0 10px 30px rgba(0,0,0,.14);border-right:5px solid '+CFG.color+';transform:translateY(140%);opacity:0;transition:transform .55s cubic-bezier(.2,.9,.3,1.2),opacity .4s}\
 .hm-toast.show{transform:none;opacity:1}\
 .hm-toast-ic{width:48px;height:48px;border-radius:50%;background:#e6f4f1;display:grid;place-items:center;font-size:22px;flex:0 0 48px}\
@@ -166,24 +167,26 @@
     var p = path(); if (CFG.skipPaths.some(function(s){ return p.indexOf(s)===0; })) return;
     var home = isHome(), DON = [], items = [], pastMode = false, ptr = 0, timer, box, list, head;
     function fmt(n){ return Number(n).toLocaleString('en-US')+' ريال'; }
-    function ago(t){ var m=Math.max(0,Math.round((Date.now()-new Date(t))/60000)); if(m<1) return 'الآن'; if(m<60) return 'قبل '+m+' دقيقة'; var h=Math.round(m/60); if(h<24) return 'قبل '+h+' ساعة'; var d=Math.round(h/24); return d<7?'قبل '+d+' يوم':d<30?'قبل '+Math.round(d/7)+' أسبوع':'قبل '+Math.round(d/30)+' شهر'; }
+    function ago(t){ var m=Math.max(0,Math.round((Date.now()-new Date(t))/60000)); if(m>CFG.timeMaxMin) return ''; if(m<1) return 'الآن'; return 'قبل '+m+' دقيقة'; }
+    function urgent(d){ return !!(CFG.urgentWord && d.project && d.project.indexOf(CFG.urgentWord)>-1); }
+    function rank(a,b){ var ua=urgent(a)?1:0, ub=urgent(b)?1:0; if(ua!==ub) return ub-ua; var am=Number(a.amount)||0, bm=Number(b.amount)||0; if(am!==bm) return bm-am; return new Date(b.time)-new Date(a.time); }
     function nm(d){ return CFG.showName && d.name ? d.name : 'فاعل خير'; }
     function compute(){
       var now = Date.now();
-      items = DON.filter(function(d){ return d && d.time && (now-new Date(d.time)) < CFG.maxAgeHours*3600000; }).sort(function(a,b){ return new Date(b.time)-new Date(a.time); });
+      var ok = DON.filter(function(d){ return d && d.time && (Number(d.amount)||0) >= CFG.minAmount; });
+      items = ok.filter(function(d){ return (now-new Date(d.time)) < CFG.maxAgeHours*3600000; }).sort(rank);
       pastMode = false;
       if (!items.length && CFG.fallback){
-        var old = DON.filter(function(d){ return d && d.time && (now-new Date(d.time)) < CFG.fallbackDays*86400000; });
-        items = shuffle(old, seeded(Math.floor(now/3600000))); pastMode = items.length > 0;
+        items = ok.filter(function(d){ return (now-new Date(d.time)) < CFG.fallbackDays*86400000; }).sort(rank); pastMode = items.length > 0;
       }
     }
     /* --- الصندوق (الرئيسية) --- */
     function card(d){ return el('div','hm-live-item','<span class="hm-live-av">🤲</span><span class="hm-live-txt"><b>'+esc(nm(d))+'</b> تبرّع'+(d.project?' لـ <b>'+esc(d.project)+'</b>':'')+'</span>'+
-      (CFG.hideAmount||!d.amount?'':'<span class="hm-live-amt">'+fmt(d.amount)+'</span>')+(pastMode?'':'<span class="hm-live-time">'+ago(d.time)+'</span>')); }
+      (CFG.hideAmount||!d.amount?'':'<span class="hm-live-amt">'+fmt(d.amount)+'</span>')+(pastMode||!ago(d.time)?'':'<span class="hm-live-time">'+ago(d.time)+'</span>')); }
     function renderBox(){
       if (!box){ box = el('section','hm-live'); box.setAttribute('dir','rtl');
         box.innerHTML='<div class="hm-live-box"><div class="hm-live-head"><span class="hm-pulse"></span><h3>آخر التبرعات</h3></div><div class="hm-live-list"></div><div class="hm-live-cta"><a href="'+esc(CFG.donateLink)+'">شارك أهل الخير وتبرّع الآن</a></div></div>';
-        if (CFG._afterReviews) CFG._afterReviews.parentNode.insertBefore(box, CFG._afterReviews.nextSibling); else mount(CFG.donationsTarget === 'after-reviews' ? 'footer' : CFG.donationsTarget, box);
+        if (CFG._afterReviews) CFG._afterReviews.parentNode.insertBefore(box, CFG._afterReviews); else mount(CFG.donationsTarget === 'after-reviews' ? 'footer' : CFG.donationsTarget, box);
         list = box.querySelector('.hm-live-list'); head = box.querySelector('h3');
         list.parentNode.addEventListener('mouseenter',function(){clearInterval(timer);}); list.parentNode.addEventListener('mouseleave',renderBox); }
       clearInterval(timer); list.innerHTML=''; head.textContent = pastMode ? 'من تبرعات الأيام الماضية' : 'آخر التبرعات';
@@ -195,7 +198,7 @@
     var toastEl, toastTimer, count = 0, started = false;
     function showToast(d){
       if (!toastEl){ toastEl = el('div','hm-toast'); toastEl.setAttribute('role','status'); document.body.appendChild(toastEl); }
-      var sub = []; if (d.city) sub.push('📍 '+esc(d.city)); sub.push(esc(CFG.orgName)); if (!pastMode) sub.push(ago(d.time));
+      var sub = []; if (d.city) sub.push('📍 '+esc(d.city)); sub.push(esc(CFG.orgName)); if (!pastMode && ago(d.time)) sub.push(ago(d.time));
       toastEl.innerHTML = '<span class="hm-toast-ic">🤲</span><div class="hm-toast-body"><div class="hm-toast-t"><b>'+esc(nm(d))+'</b> تبرّع'+(CFG.hideAmount||!d.amount?'':' بـ <b>'+fmt(d.amount)+'</b>')+(d.project?' لـ <b>'+esc(d.project)+'</b>':'')+'</div><div class="hm-toast-s">'+sub.join(' <span>•</span> ')+'</div></div>'+
         '<button class="hm-toast-x" aria-label="إغلاق">✕</button><span class="hm-toast-bar" style="animation-duration:'+CFG.toastStay+'ms"></span>';
       toastEl.querySelector('.hm-toast-x').onclick = function(){ toastEl.classList.remove('show'); count = CFG.toastMax; };
