@@ -71,7 +71,7 @@
 .hm-quote{color:var(--hm-main);font-size:40px;line-height:.6;font-family:Georgia,serif;transform:scaleX(-1)}\
 .hm-text{color:#333;font-size:15px;line-height:1.8;flex:1;font-style:italic}\
 .hm-who{display:flex;align-items:center;gap:10px;margin-top:16px}\
-.hm-avatar{width:40px;height:40px;border-radius:50%;background:#222;display:grid;place-items:center;color:#fff;font-size:18px}\
+.hm-avatar{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:20px;font-weight:700;overflow:hidden;flex:0 0 44px}.hm-avatar img{width:100%;height:100%;object-fit:cover;display:block}\
 .hm-name{font-weight:700;color:#333;font-size:15px}.hm-date{color:#777;font-size:12px;margin-right:auto}\
 .hm-dots{display:flex;justify-content:center;gap:10px;margin:28px 0 24px}\
 .hm-dots button{width:12px;height:12px;border-radius:50%;border:0;background:#cfcfcf;cursor:pointer;padding:0;transition:.3s}\
@@ -110,6 +110,15 @@
   document.head.appendChild(el('style', null, css));
 
   /* ===================== 1) صندوق التقييمات ===================== */
+  var AV_COLORS = [CFG.color, '#c9a24a', '#2f3e46'];
+  function avatar(rv){
+    var name = (rv.name || '').trim();
+    if (rv.img) return '<span class="hm-avatar"><img src="'+esc(rv.img)+'" alt=""></span>';
+    var first = name ? name.charAt(0) : '';
+    var sum = 0; for (var i = 0; i < name.length; i++) sum += name.charCodeAt(i);
+    var bg = AV_COLORS[sum % AV_COLORS.length];
+    return '<span class="hm-avatar" style="background:'+bg+'">'+(first ? esc(first) : '🤲')+'</span>';
+  }
   function buildReviews(){
     if (!CFG.reviewsEnabled || !isHome()) return;
     var source = CFG.REVIEWS.slice(), etharSec = null;
@@ -121,7 +130,8 @@
           var nameEl = CFG.ethar.name ? it.querySelector(CFG.ethar.name) : null, textEl = CFG.ethar.text ? it.querySelector(CFG.ethar.text) : null;
           var text = (textEl ? textEl.textContent : it.textContent).trim().replace(/\s+/g,' ');
           if (!text || seen[text]) return; seen[text] = 1;            /* إيثار يكرر العناصر في السلايدر */
-          source.push({ name: nameEl ? nameEl.textContent.trim() : '', stars: 5, text: text });
+          var imgEl = it.querySelector('img'), img = imgEl && imgEl.getAttribute('src') && !/placeholder|no-image|default/i.test(imgEl.src) && imgEl.naturalWidth > 2 ? imgEl.src : '';
+          source.push({ name: nameEl ? nameEl.textContent.trim() : '', stars: 5, text: text, img: img });
         });
       }
     }
@@ -137,7 +147,7 @@
     function stars(n){ var s=''; for(var k=1;k<=5;k++) s+='<span'+(k>n?' class="off"':'')+'>★</span>'; return s; }
     shown.forEach(function(rv){
       track.appendChild(el('article','hm-card','<div class="hm-top"><div class="hm-stars">'+stars(rv.stars||5)+'</div><span class="hm-quote">”</span></div>'+
-        '<p class="hm-text">"'+esc(rv.text)+'"</p><div class="hm-who"><span class="hm-avatar">👤</span><span class="hm-name">'+esc(rv.name||'فاعل خير')+'</span>'+(rv.date?'<span class="hm-date">'+esc(rv.date)+'</span>':'')+'</div>'));
+        '<p class="hm-text">"'+esc(rv.text)+'"</p><div class="hm-who">'+avatar(rv)+'<span class="hm-name">'+esc(rv.name||'فاعل خير')+'</span>'+(rv.date?'<span class="hm-date">'+esc(rv.date)+'</span>':'')+'</div>'));
     });
     var cards = track.children, idx = 0, timer;
     function perView(){ var w=innerWidth; return w<=600?1:w<=1024?2:4; }
