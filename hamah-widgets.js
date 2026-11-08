@@ -74,8 +74,8 @@
 .hm-avatar{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:20px;font-weight:700;overflow:hidden;flex:0 0 44px}.hm-avatar img{width:100%;height:100%;object-fit:cover;display:block}\
 .hm-name{font-weight:700;color:#333;font-size:15px}.hm-date{color:#777;font-size:12px;margin-right:auto}\
 .hm-dots{display:flex;justify-content:center;gap:10px;margin:28px 0 24px}\
-.hm-dots button{width:12px;height:12px;border-radius:50%;border:0;background:#cfcfcf;cursor:pointer;padding:0;transition:.3s}\
-.hm-dots button.on{background:var(--hm-main);transform:scale(1.15)}\
+.hm-dots button{width:12px!important;height:12px!important;min-width:0!important;min-height:0!important;max-height:12px!important;line-height:0!important;font-size:0!important;border-radius:50%!important;border:0!important;background:#cfcfcf!important;cursor:pointer;padding:0!important;margin:0!important;box-shadow:none!important;appearance:none;-webkit-appearance:none;flex:0 0 12px;display:block;transition:.3s}\
+.hm-dots button.on{background:var(--hm-main)!important;transform:scale(1.15)}\
 .hm-more{display:flex;justify-content:center}\
 .hm-more a{display:inline-flex;align-items:center;justify-content:center;gap:10px;line-height:1;border:1.5px solid var(--hm-main);color:var(--hm-main);padding:15px 34px;border-radius:40px;text-decoration:none;font-size:17px;transition:.3s}\
 .hm-more a:hover{background:var(--hm-main);color:#fff}\
