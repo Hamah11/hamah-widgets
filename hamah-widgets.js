@@ -247,3 +247,12 @@
   document.addEventListener('DOMContentLoaded',run);
   if(window.MutationObserver){ new MutationObserver(run).observe(document.documentElement,{childList:true,subtree:true}); }
 })();
+
+
+/* HM-DEDUPE 2026-11-09: يحذف أي صندوق «آخر التبرعات» قديم (يحوي hmLiveList) ويُبقي الصندوق الحالي فقط */
+(function(){
+   function clean(){ var a=document.querySelectorAll('.hm-live'); for(var i=0;i<a.length;i++){ if(a[i].querySelector('#hmLiveList') && a[i].parentNode){ a[i].parentNode.removeChild(a[i]); } } }
+   clean();
+   document.addEventListener('DOMContentLoaded',clean);
+   if(window.MutationObserver){ var mo=new MutationObserver(clean); mo.observe(document.documentElement,{childList:true,subtree:true}); setTimeout(function(){ mo.disconnect(); },30000); }
+})();
