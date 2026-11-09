@@ -63,7 +63,7 @@
 .hm-reviews{--hm-main:'+CFG.color+';--hm-star:#f5b301;font-family:'+CFG.font+';padding:48px 16px;background:#fff;overflow:hidden;direction:rtl}\
 .hm-reviews *,.hm-live *,.hm-toast *{box-sizing:border-box}\
 .hm-reviews h2{text-align:center;color:var(--hm-main);font-size:28px;margin:0 0 32px;font-weight:700}\
-.hm-track-wrap{max-width:1240px;margin:0 auto;position:relative}\
+.hm-track-wrap{max-width:1240px;margin:0 auto;position:relative;overflow:hidden;padding:8px 8px 24px}\
 .hm-track{display:flex;gap:24px;transition:transform .7s cubic-bezier(.4,0,.2,1)}\
 .hm-card{flex:0 0 calc(25% - 18px);background:#fff;border-radius:16px;padding:26px 24px 22px;min-height:230px;box-shadow:0 4px 18px rgba(0,0,0,.06);border:1.5px solid transparent;display:flex;flex-direction:column;opacity:.9;transform:scale(.98);transition:all .5s}\
 .hm-card.is-active{border-color:var(--hm-main);opacity:1;transform:scale(1)}\
@@ -82,7 +82,7 @@
 .hm-more a:hover{background:var(--hm-main);color:#fff}\
 .hm-empty{text-align:center;color:#777;padding:30px;font-size:16px}.hm-empty a{color:var(--hm-main);font-weight:700}\
 @media(max-width:1024px){.hm-card{flex-basis:calc(50% - 12px)}}\
-@media(max-width:600px){.hm-card{flex-basis:100%}.hm-reviews h2{font-size:22px}}\
+@media(max-width:600px){.hm-card{flex-basis:100%}.hm-card,.hm-card.is-active{transform:none}.hm-reviews h2{font-size:22px}}\
 .hm-live{--c:'+CFG.color+';font-family:'+CFG.font+';max-width:1240px;margin:40px auto;padding:0 16px;direction:rtl}\
 .hm-live-box{background:#f3faf8;border:1px solid #d6ebe6;border-radius:18px;padding:22px 24px;position:relative;overflow:hidden}\
 .hm-live-head{display:flex;align-items:center;gap:10px;margin-bottom:16px}.hm-live-head h3{margin:0;color:var(--c);font-size:20px;font-weight:700}\
@@ -153,7 +153,7 @@
     var cards = track.children, idx = 0, timer;
     function perView(){ var w=innerWidth; return w<=600?1:w<=1024?2:4; }
     function pages(){ return Math.max(1, cards.length-perView()+1); }
-    function go(n){ idx=(n+pages())%pages(); var cw=cards[0].getBoundingClientRect().width; track.style.transform='translateX('+(idx*(cw+24))+'px)';
+    function go(n){ idx=(n+pages())%pages(); var cw=cards[0].offsetWidth, gap=parseFloat(getComputedStyle(track).columnGap)||24; track.style.transform='translateX('+(idx*(cw+gap))+'px)';
       for(var c=0;c<cards.length;c++) cards[c].classList.toggle('is-active',c===idx); for(var d=0;d<dots.children.length;d++) dots.children[d].classList.toggle('on',d===idx); }
     function buildDots(){ dots.innerHTML=''; for(var p=0;p<pages();p++){ var b=el('button'); b.setAttribute('aria-label','تقييم '+(p+1)); b.onclick=(function(p){return function(){go(p);restart();};})(p); dots.appendChild(b);} }
     function restart(){ clearInterval(timer); timer=setInterval(function(){go(idx+1);},CFG.reviewsAutoMs); }
