@@ -291,3 +291,30 @@
   window.addEventListener('load',fixLinks);
   setTimeout(fixLinks,3000);
 })();
+
+
+/* HM-SCHEMA-FIX (2026-11-10) — تكملة بيانات الفرص لجوجل: شحن مجاني + لا استرجاع */
+(function(){
+  function fix(){
+    var ss=document.querySelectorAll('script[type="application/ld+json"]');
+    for(var i=0;i<ss.length;i++){
+      var s=ss[i],d;
+      try{d=JSON.parse(s.textContent);}catch(e){continue;}
+      if(!d||String(d['@type']).toLowerCase()!=='product'||!d.offers)continue;
+      d['@type']='Product';
+      (Array.isArray(d.offers)?d.offers:[d.offers]).forEach(function(x){
+        if(x.availability&&x.availability.indexOf('schema.org')<0)x.availability='https://schema.org/'+x.availability;
+        x.shippingDetails={'@type':'OfferShippingDetails',
+          shippingRate:{'@type':'MonetaryAmount',value:0,currency:'SAR'},
+          shippingDestination:{'@type':'DefinedRegion',addressCountry:'SA'},
+          deliveryTime:{'@type':'ShippingDeliveryTime',
+            handlingTime:{'@type':'QuantitativeValue',minValue:0,maxValue:0,unitCode:'DAY'},
+            transitTime:{'@type':'QuantitativeValue',minValue:0,maxValue:0,unitCode:'DAY'}}};
+        x.hasMerchantReturnPolicy={'@type':'MerchantReturnPolicy',applicableCountry:'SA',
+          returnPolicyCategory:'https://schema.org/MerchantReturnNotPermitted'};
+      });
+      s.textContent=JSON.stringify(d);
+    }
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',fix);else fix();
+})();
