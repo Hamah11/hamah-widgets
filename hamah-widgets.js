@@ -218,3 +218,32 @@
   function init(){ try { buildReviews(); } catch(e){} try { buildDonations(); } catch(e){} }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
+
+
+/* HM-CARD-DESC 2026-11-09: يعرض نص الوصف المختصر (بدون ##share##) تحت اسم المشروع في بطاقات الفرص */
+(function(){
+  var busy=false;
+  var NBSP=new RegExp(String.fromCharCode(160),'g');
+  function run(){
+    if(busy) return; busy=true;
+    try{
+      var cards=document.querySelectorAll('.product-inner[data-short-description]');
+      for(var i=0;i<cards.length;i++){
+        var el=cards[i];
+        if(el.querySelector('.hm-card-desc')) continue;
+        var info=el.querySelector('.product-info'); if(!info) continue;
+        var raw=el.getAttribute('data-short-description')||'';
+        var d=document.createElement('div');
+        d.innerHTML=raw.replace(/##[\s\S]*?##/g,'');
+        var txt=(d.textContent||'').replace(NBSP,' ').replace(/\s+/g,' ').trim();
+        if(!txt) continue;
+        var p=document.createElement('p'); p.className='hm-card-desc'; p.textContent=txt;
+        info.insertBefore(p, info.firstChild);
+      }
+    }catch(e){}
+    busy=false;
+  }
+  run();
+  document.addEventListener('DOMContentLoaded',run);
+  if(window.MutationObserver){ new MutationObserver(run).observe(document.documentElement,{childList:true,subtree:true}); }
+})();
