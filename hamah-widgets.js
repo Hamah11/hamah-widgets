@@ -256,3 +256,26 @@
    document.addEventListener('DOMContentLoaded',clean);
    if(window.MutationObserver){ var mo=new MutationObserver(clean); mo.observe(document.documentElement,{childList:true,subtree:true}); setTimeout(function(){ mo.disconnect(); },30000); }
 })();
+
+/* alt للصور الفارغة — تحسين الوصول ومحركات البحث */
+(function(){
+  var GEN='جمعية هامة لخدمة الحجاج والمعتمرين';
+  function head(img){ var p=img.parentElement; for(var k=0;k<8&&p;k++){ var h=p.querySelector&&p.querySelector('h1,h2,h3'); if(h&&!h.contains(img)){ return (h.textContent||'').replace(/\s+/g,' ').trim(); } p=p.parentElement; } return ''; }
+  function fixAlt(){
+    var imgs=document.querySelectorAll('img');
+    for(var i=0;i<imgs.length;i++){
+      var im=imgs[i]; if((im.getAttribute('alt')||'').trim()) continue;
+      var h=head(im), a=GEN;
+      if(im.closest('.img_slider_block')){ a=GEN+' - تبرع آمن وعطاء دائم'; }
+      else if(h.indexOf('الجهات الإشرافية')>-1){ a='شعار جهة إشرافية'; }
+      else if(h.indexOf('شركاء النجاح')>-1){ a='شعار شريك نجاح'; }
+      else if(h.indexOf('خيارات الدفع')>-1){ a='طرق الدفع المتاحة'; }
+      else if(h && h.length<80){ a=h; }
+      im.setAttribute('alt',a);
+    }
+  }
+  fixAlt();
+  document.addEventListener('DOMContentLoaded',fixAlt);
+  window.addEventListener('load',fixAlt);
+  if(window.MutationObserver){ var t; var mo=new MutationObserver(function(){ clearTimeout(t); t=setTimeout(fixAlt,200); }); mo.observe(document.documentElement,{childList:true,subtree:true}); setTimeout(function(){ mo.disconnect(); },30000); }
+})();
