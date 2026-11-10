@@ -318,3 +318,21 @@
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',fix);else fix();
 })();
+
+
+/* HM-CSS-SYNC: يطبّق CSS الرئيسية على الصفحات التي يقدّم لها زد نسخة قديمة. يُحفظ في المتصفح ساعة. */
+(function(){
+  var MARK='HM-HIDE-ETHAR-TESTIMONIALS', KEY='hm_css_sync_v1', TTL=3600000;
+  function hasCurrent(){ var s=document.querySelectorAll('style'); for(var i=0;i<s.length;i++){ if(s[i].id!=='hm-css-sync' && s[i].textContent.indexOf(MARK)>-1) return true; } return false; }
+  function apply(css){ if(!css) return; var el=document.getElementById('hm-css-sync'); if(!el){ el=document.createElement('style'); el.id='hm-css-sync'; } if(el.textContent!==css) el.textContent=css; (document.head||document.documentElement).appendChild(el); }
+  function read(){ try{ return JSON.parse(localStorage.getItem(KEY)||'null'); }catch(e){ return null; } }
+  function save(css){ try{ localStorage.setItem(KEY, JSON.stringify({t:Date.now(), css:css})); }catch(e){} }
+  function refresh(){
+    fetch('/', {credentials:'same-origin', cache:'no-store'}).then(function(r){ return r.text(); }).then(function(html){
+      var re=/<style[^>]*>([\s\S]*?)<\/style>/g, m;
+      while((m=re.exec(html))){ if(m[1].indexOf(MARK)>-1){ save(m[1]); if(!hasCurrent()) apply(m[1]); return; } }
+    }).catch(function(){});
+  }
+  function run(){ if(hasCurrent()) return; var c=read(); if(c && c.css) apply(c.css); if(!c || !c.css || (Date.now()-c.t)>TTL) refresh(); }
+  if(document.head && document.querySelector('style')) run(); else document.addEventListener('DOMContentLoaded', run);
+})();
