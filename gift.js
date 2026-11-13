@@ -319,6 +319,7 @@
         ';direction:rtl' + I + ';background:#fff' + I + ';color:' + C1 + I + ';border:1.5px solid ' + C1 + I +
         ';padding:4px 16px' + I + ';text-decoration:none' + I + ';font-family:' + FONT + I + ';white-space:nowrap' + I +
         ';box-sizing:border-box' + I + ';cursor:pointer;line-height:1.2' + I + ';margin:0' + I + '}',
+      '.hmg-pbtn:hover,.hmg-pbtn:focus,.hmg-pbtn:active,.hmg-clink:hover,.hmg-clink:focus,.hmg-clink:active{background:#fff' + I + ';color:' + C1 + I + '}',
       '.hmg-pbtn{animation:hmg-glow 2.6s ease-in-out infinite}',
       '.hmg-pbtn .hmg-ic{width:30px;height:30px;flex:0 0 30px}',
       '.hmg-clink .hmg-ic{width:28px;height:28px;flex:0 0 28px}',
