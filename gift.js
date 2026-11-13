@@ -46,8 +46,10 @@
     {k: 'general', l: 'عام'}, {k: 'boy', l: 'مولود'}, {k: 'wedding', l: 'زواج'}, {k: 'grad', l: 'تخرّج'},
     {k: 'home', l: 'منزل'}, {k: 'quran', l: 'مصحف'}, {k: 'ramadan', l: 'رمضان'}, {k: 'eid', l: 'عيد'},
     {k: 'hajj', l: 'حج'}, {k: 'calm', l: 'هادئ'}, {k: 'heal', l: 'شفاء'}, {k: 'girl', l: 'مولودة'},
-    {k: 'thanks', l: 'شكر'}, {k: 'parents', l: 'والدان'}
+    {k: 'thanks', l: 'شكر'}, {k: 'parents', l: 'والدان'},
+    {k: 'mourn', l: 'عزاء'}
   ];
+  var MOURN = 14;   // بطاقة المتوفى الوحيدة (أسود وأبيض وفضي)
 
   // المناسبات — نفس الترتيب في السكربت. الجديد يُضاف في الآخر فقط.
   var OCC = [
@@ -97,7 +99,7 @@
       m: 'برّاً بك، وجزاك الله عني خير الجزاء', f: 'برّاً بكِ، وجزاكِ الله عني خير الجزاء',
       w: 'أبي، منك تعلّمت العطاء، ومن أجمل ما أهديك صدقة عنك في خدمة ضيوف الرحمن. جزاك الله عنّي كل خير.',
       wf: 'أمي، عمري وأنا أفرح بدعواتك، واليوم أهديك مع دعائي صدقة عنك في خدمة ضيوف الرحمن.'},
-    {g: 2, e: '🕊️', l: 'صدقة عن متوفى', d: 9, dead: 1,
+    {g: 2, e: '🕊️', l: 'صدقة عن متوفى', d: 14, dead: 1,
       m: 'رحمه الله، وجعلها في ميزان حسناته', f: 'رحمها الله، وجعلها في ميزان حسناتها',
       w: 'غاليكم غالٍ علينا.. وهذي صدقة عنه في خدمة ضيوف الرحمن بمكة، الله يرحمه.',
       wf: 'غاليتكم غالية علينا.. وهذي صدقة عنها في خدمة ضيوف الرحمن بمكة، الله يرحمها.'},
@@ -229,6 +231,8 @@
     o.oSet = !!s.oSet;
     o.d = (s.d === +s.d && s.d >= 0 && s.d < DS.length && s.d % 1 === 0) ? s.d : OCC[o.o].d;
     o.dSet = !!s.dSet;
+    if (OCC[o.o].dead) o.d = MOURN;
+    else if (o.d === MOURN) o.d = OCC[o.o].d;
     o.th = s.th === 1 ? 1 : 0;
     o.femSet = !!s.femSet;
     o.fem = !!s.fem && hasFem(o.o);
@@ -300,7 +304,12 @@
     var I = ' !important';
     var r = [
       // إخفاء إهداء زد الجاهز (قرار الجمعية)
-      'a[id^="btnVisibleGiftForm-"],#gift_card_preview_modal{display:none' + I + '}',
+      'a[id^="btnVisibleGiftForm-"],#gift_card_preview_modal,.nt_pr .product-inner .product-inner-add-cart a.single_add_to_cart_button.small-add-to-cart[id^="btnVisibleGiftForm-"]{display:none' + I + '}',
+      '.hmg-mourn{display:flex;gap:10px;margin:10px 0}',
+      '.hmg-ov .hmg-mz{flex:1 1 0;border:2px solid transparent' + I + ';border-radius:10px;padding:4px' + I + ';background:none' + I + ';cursor:pointer;text-align:center;font:inherit;color:inherit}',
+      '.hmg-ov .hmg-mz.on{border-color:' + C1 + I + '}',
+      '.hmg-mz img{display:block;width:100%;border-radius:6px}',
+      '.hmg-mz span{display:block;margin-top:4px;font-size:14px;font-weight:700}',
       'html.hmg-lock,html.hmg-lock body{overflow:hidden' + I + '}',
       // زر صفحة المشروع
       '.hmg-row{flex-wrap:wrap' + I + ';gap:8px' + I + '}',
@@ -532,7 +541,7 @@
   // نفس مقاسات السكربت (مقياس عرض 874)
   var L = {
     colX: 188, colW: 498, colTop: 96,
-    qrX: 452, qrSize: 100, qrInner: 92, qrBottom: 30, qrR: 10,
+    qrX: 452, qrSize: 100, qrInner: 92, qrBottom: 33, qrR: 10, topLine: 23,
     qrTextX: 326, qrTextW: 118, qrTextDy: 18, qrTextFs: 14,
     l1Fs: 18, nameLh: 1.3, nameGap: 12,
     sepTop: 18, sepH: 8, sepBottom: 14, sepLine: 70,
@@ -552,8 +561,16 @@
       capLine: dark ? C2 : C1
     };
     if (design === 'calm') p.gold = dark ? '#D5DDDA' : '#6F7C77';
+    if (design === 'mourn') p = MONO[dark ? 0 : 1];
     return p;
   }
+  // بطاقة المتوفى: أسود وأبيض وفضي فقط (نفس ألوان السكربت)
+  var MONO = [
+    {gold: '#D3D7DC', name: '#FFFFFF', dua: '#E4E7EA', sec: '#F2F4F5', capFill: 'rgba(0,0,0,.35)', capLine: '#C3C8CF',
+      qrFill: '#FFFFFF', qrLine: '#C3C8CF', qrW: 1, code: '#B8BEC5'},
+    {gold: '#666D75', name: '#1C2226', dua: '#3A4247', sec: '#3A4247', capFill: '#1C2226', capLine: '#1C2226',
+      qrFill: '#FFFFFF', qrLine: '#A9AFB6', qrW: 1, code: '#62696F'}
+  ];
 
   function splitHalf(s) {
     var mid = Math.floor(s.length / 2), best = -1;
@@ -570,13 +587,14 @@
     if (t.length > 30) return splitHalf(t);
     return [t];
   }
+  // درجات الحجم 62 و54 و44 و40 و36: الاسم الطويل يصغر درجتين كحد أعلى حتى يبقى سطراً واحداً (نفس السكربت)
+  var NAME_STEPS = [62, 54, 44, 40, 36];
   function nameLayout(name, nsIdx) {
-    var fs = NS[nsIdx] * 8.74;
     var n = name.length;
-    if (n * fs * 0.56 > L.colW) {
-      fs = NS[0] * 8.74;
-      if (n * fs * 0.56 > L.colW) return {fs: fs, lines: splitHalf(name)};
-    }
+    var si = NAME_STEPS.indexOf([44, 54, 62][nsIdx]), sMax = Math.min(NAME_STEPS.length - 1, si + 2);
+    while (si < sMax && n * NAME_STEPS[si] * 0.56 > L.colW) si++;
+    var fs = NAME_STEPS[si];
+    if (n * fs * 0.56 > L.colW) return {fs: fs, lines: splitHalf(name)};
     return {fs: fs, lines: [name]};
   }
 
@@ -609,7 +627,7 @@
     if (ribbon) card.appendChild(h('div', 'hmg-rib', ribbon));
     function fixU() { if (!cqOk && card.offsetWidth) card.style.setProperty('--u', (card.offsetWidth / 874) + 'px'); }
     card.update = function (s) {
-      card.style.backgroundImage = 'url("' + IMG + DS[s.d].k + '-' + (s.th === 1 ? 'l' : 'd') + '.jpg")';
+      card.style.backgroundImage = 'url("' + IMG + (OCC[s.o].dead ? 'mourn' : DS[s.d].k) + '-' + (s.th === 1 ? 'l' : 'd') + '.jpg")';
       draw(lay, s);
       fixU();
     };
@@ -624,7 +642,7 @@
   function draw(lay, s) {
     lay.textContent = '';
     var occ = OCC[s.o], dead = !!occ.dead;
-    var pal = palette(s.th, DS[s.d].k);
+    var pal = palette(s.th, dead ? 'mourn' : DS[s.d].k);
     var to = s.to || (dead ? 'اسم المتوفى' : 'من تحب');
     var nm = nameLayout(to, autoNs(to));
     var dua = duaLines((s.fem && occ.f) ? occ.f : occ.m);
@@ -632,9 +650,18 @@
       l1: L.l1Fs * 1.35, name: nm.lines.length * nm.fs * L.nameLh, sep: L.sepTop + L.sepH + L.sepBottom,
       dua: dua.length * L.duaFs * L.duaLh, cap: L.capFs * 1.3 + 2 * L.capPadY, fr: L.frFs * 1.35
     };
-    var total = hh.l1 + L.nameGap + hh.name + hh.sep + hh.dua + L.capGap + hh.cap + L.frGap + hh.fr;
+    var gN = Math.round(nm.fs * 0.2);   // فراغ تحت الاسم لذيل الياء
+    var total = hh.l1 + L.nameGap + hh.name + gN + hh.sep + hh.dua + L.capGap + hh.cap + L.frGap + hh.fr;
     var qrTop = 620 - L.qrBottom - L.qrSize;
-    var y = Math.max(L.colTop, L.colTop + (qrTop - 14 - L.colTop - total) / 2);
+    var room = qrTop - L.topLine - 40;
+    if (total > room) {
+      var cut = Math.min(total - room, hh.name * 0.3);
+      hh.name -= cut; total -= cut;
+      nm.fs = hh.name / (L.nameLh * nm.lines.length);
+      var gN2 = Math.round(nm.fs * 0.2); total -= gN - gN2; gN = gN2;
+    }
+    // الفراغ أعلى «إهداء إلى» = الفراغ بين «من:» وأعلى الباركود (20 على الأقل)
+    var y = L.topLine + Math.max(20, (qrTop - L.topLine - total) / 2);
     var mid = L.colX + L.colW / 2;
     function line(x1, x2, yy, w, color) {
       var e = h('div');
@@ -652,7 +679,7 @@
     var ne = textEl(nm.lines.join('\n'), L.colX - 20, y, L.colW + 40, hh.name, nm.fs, 'main', 800, pal.name, 100);
     if (!s.to) ne.style.opacity = '.6';
     lay.appendChild(ne);
-    y += hh.name + L.sepTop;
+    y += hh.name + gN + L.sepTop;
     line(mid - 8 - L.sepLine, mid - 8, y + L.sepH / 2, 1.2, pal.gold);
     line(mid + 8, mid + 8 + L.sepLine, y + L.sepH / 2, 1.2, pal.gold);
     var dm = h('div');
@@ -663,7 +690,7 @@
     y += L.sepH + L.sepBottom;
     lay.appendChild(textEl(dua.join('\n'), L.colX - 20, y, L.colW + 40, hh.dua, L.duaFs, 'dua', 700, pal.dua, 115));
     y += hh.dua + L.capGap;
-    var capText = '«' + (s.p ? PROJECTS[s.p] : 'اسم المشروع') + '» ' + FIELD;
+    var capText = (dead ? 'في مشروع «' : 'أجر مشروع «') + (s.p ? PROJECTS[s.p] : 'اسم المشروع') + '» ' + FIELD;
     var capW = Math.min(L.colW, capText.length * L.capFs * 0.52 + 2 * L.capPadX);
     var cap = h('div', 'hmg-t', capText);
     box(cap, mid - capW / 2, y, capW, hh.cap);
@@ -672,6 +699,7 @@
     cap.style.border = U(1.3) + ' solid ' + pal.capLine;
     cap.style.fontFamily = 'Tajawal,' + FONT;
     cap.style.fontSize = U(L.capFs);
+    cap.style.paddingTop = U(4.5);   // يُنزل الحروف 2.25 فتتوسط الكبسولة (قِيس في Chrome)
     lay.appendChild(cap);
     y += hh.cap + L.frGap;
     var from = s.anon ? 'فاعل خير' : (s.from || 'اسمك');
@@ -679,7 +707,7 @@
     // مكان الباركود (الباركود الحقيقي يُرسم بعد التبرع)
     var q = h('div');
     box(q, L.qrX, qrTop, L.qrSize, L.qrSize);
-    q.style.cssText += ';box-sizing:border-box;background:#FBF6EC;border:' + U(1.25) + ' solid ' + C2 + ';border-radius:' + U(L.qrR);
+    q.style.cssText += ';box-sizing:border-box;background:' + (pal.qrFill || '#FBF6EC') + ';border:' + U(pal.qrW || 1.25) + ' solid ' + (pal.qrLine || C2) + ';border-radius:' + U(L.qrR);
     lay.appendChild(q);
     var qi = h('div');
     var ins = (L.qrSize - L.qrInner) / 2 + 10;
@@ -688,7 +716,7 @@
       'repeating-linear-gradient(90deg,rgba(28,34,38,.10) 0 ' + U(6) + ',transparent ' + U(6) + ' ' + U(12) + ')';
     lay.appendChild(qi);
     lay.appendChild(textEl('امسح الباركود\nلفتح البطاقة', L.qrTextX, qrTop + L.qrTextDy, L.qrTextW, L.qrTextFs * 2.9, L.qrTextFs, 'main', 700, pal.sec, 100));
-    lay.appendChild(textEl('••••-••••', L.qrTextX, qrTop + L.qrTextDy + L.qrTextFs * 2.9, L.qrTextW, L.qrTextFs * 1.45, L.qrTextFs, 'main', 700, pal.gold, 100, true));
+    lay.appendChild(textEl('••••-••••', L.qrTextX, qrTop + L.qrTextDy + L.qrTextFs * 2.9, L.qrTextW, L.qrTextFs * 1.45, L.qrTextFs, 'main', 700, pal.code || pal.gold, 100, true));
   }
 
   /* ======================= صفحة المشروع ======================= */
@@ -865,7 +893,8 @@
     function pick(i) {
       st.o = i;
       st.oSet = true;
-      if (!st.dSet) st.d = OCC[i].d;
+      if (OCC[i].dead) st.d = MOURN;
+      else if (!st.dSet || st.d === MOURN) st.d = OCC[i].d;
       if (!hasFem(i)) st.fem = false;
       else if (!st.femSet) st.fem = FEM_RX.test(st.to);
     }
@@ -1051,12 +1080,26 @@
       w.appendChild(h('label', 'hmg-lbl', 'بطاقتك'));
       var pv = preview(st, 'شكل تقريبي، والبطاقة النهائية بعد التبرع');
       w.appendChild(pv);
+      if (OCC[st.o].dead) {
+        var mrow = h('div', 'hmg-mourn');
+        [0, 1].forEach(function (t) {
+          var mz = btn('hmg-mz' + (st.th === t ? ' on' : ''), null, function () { st.th = t; saveState(st); render(true); });
+          var mi = h('img');
+          mi.src = IMG + 'mourn-' + (t === 1 ? 'l' : 'd') + '.jpg';
+          mi.alt = '';
+          add(mz, mi, h('span', '', t === 1 ? 'فاتحة' : 'غامقة'));
+          mrow.appendChild(mz);
+        });
+        w.appendChild(mrow);
+      } else {
       w.appendChild(btn('hmg-link', showDesign ? 'إخفاء ▴' : '🎨 غيّر شكل البطاقة (اختياري)', function () {
         showDesign = !showDesign; render(true);
       }));
-      if (showDesign) {
+      }
+      if (showDesign && !OCC[st.o].dead) {
         var row = h('div', 'hmg-designs');
         DS.forEach(function (d, i) {
+          if (i === MOURN) return;
           var z = btn('hmg-dz' + (st.d === i ? ' on' : ''), null, function () {
             st.d = i; st.dSet = true; saveState(st); render(true);
           });
