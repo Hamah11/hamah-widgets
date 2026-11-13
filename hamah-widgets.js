@@ -46,7 +46,13 @@
     show: 5, rotateMs: 3500, refreshMs: 60000,
     minAmount: 20, urgentWord: 'عاجل', timeMaxMin: 60,
     maxAgeHours: 72, fallback: true, fallbackDays: 90,
-    toastFirst: 6000, toastEvery: 20000, toastStay: 6000, toastMax: 5
+    toastFirst: 6000, toastEvery: 20000, toastStay: 6000, toastMax: 5,
+    /* --- الإهداءات في الصندوق (من سكربت الإهداء، بلا أسماء: المشروع والمناسبة والوقت فقط) --- */
+    giftFeedUrl: 'https://script.google.com/macros/s/AKfycbzhRIwPgUiUCsJ8GKARvrwhZsgpiL1jJTQjaSmbvhXpAegqRCA94CjUycXZci1uI61c/exec?a=feed',
+    giftRefreshMs: 300000,
+    // أسماء المناسبات بنفس ترتيب gift.js
+    giftOcc: ['إهداء عام', 'مولود جديد', 'زواج', 'تخرّج', 'نجاح وتفوّق', 'وظيفة أو ترقية', 'منزل جديد', 'ختم القرآن', 'شكر وتقدير',
+      'رمضان', 'عيد الفطر', 'عيد الأضحى', 'عشر ذي الحجة', 'حج أو عمرة', 'برّ الوالدين', 'صدقة عن متوفى', 'دعاء لمريض بالشفاء', 'الحمد لله على السلامة']
   };
   /* ===================================================================== */
 
@@ -99,8 +105,9 @@
 .hm-live-cta a{display:inline-block;background:var(--c);color:#fff;text-decoration:none;padding:12px 32px;border-radius:40px;font-size:16px;transition:.3s}\
 .hm-live-empty{color:#777;text-align:center;padding:30px 0;font-size:15px}\
 @media(max-width:600px){.hm-live-item{flex-wrap:wrap}.hm-live-time{width:100%;margin:4px 0 0;text-align:left}}\
-.hm-toast{position:fixed;bottom:24px;left:24px;z-index:99999;direction:rtl;font-family:'+CFG.font+';display:flex;align-items:center;gap:14px;background:#fff;border-radius:18px;padding:14px 18px 14px 22px;min-width:300px;max-width:min(420px,calc(100vw - 48px));box-shadow:0 10px 30px rgba(0,0,0,.14);border-right:5px solid '+CFG.color+';transform:translateY(140%);opacity:0;transition:transform .55s cubic-bezier(.2,.9,.3,1.2),opacity .4s}\
+.hm-toast{position:fixed;bottom:24px;left:24px;z-index:99999;direction:rtl;font-family:'+CFG.font+';display:flex;align-items:center;gap:14px;background:#fff;border-radius:18px;padding:14px 18px 14px 34px;min-width:300px;max-width:min(420px,calc(100vw - 48px));box-shadow:0 10px 30px rgba(0,0,0,.14);border-right:5px solid '+CFG.color+';transform:translateY(140%);opacity:0;transition:transform .55s cubic-bezier(.2,.9,.3,1.2),opacity .4s}\
 .hm-toast.show{transform:none;opacity:1}\
+.hm-gift-pulse{animation:hmGiftP 2.4s ease-in-out infinite}@keyframes hmGiftP{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}\
 .hm-toast-ic{width:48px;height:48px;border-radius:50%;background:#e6f4f1;display:grid;place-items:center;font-size:22px;flex:0 0 48px}\
 .hm-toast-body{flex:1;min-width:0}.hm-toast-t{color:#222;font-size:15px;line-height:1.5;font-weight:500}.hm-toast-t b{color:'+CFG.color+';font-weight:700}\
 .hm-toast-s{color:#8a8a8a;font-size:12px;margin-top:3px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}\
@@ -165,15 +172,27 @@
   function buildDonations(){
     if (!CFG.donationsEnabled || !CFG.dataUrl) return;
     var p = path(); if (CFG.skipPaths.some(function(s){ return p.indexOf(s)===0; })) return;
-    var home = isHome(), DON = [], items = [], pastMode = false, ptr = 0, timer, box, list, head;
+    var home = isHome(), DON = [], GIFTS = [], items = [], pastMode = false, ptr = 0, timer, box, list, head;
+    function isGift(d){ return d && d.t === 'gift'; }
+    function giftTxt(d){
+      var p = d.project ? ' في «<b>'+esc(d.project)+'</b>»' : '';
+      if (d.dead) return 'صدقة عن متوفى'+p;
+      var o = CFG.giftOcc[d.occ], tail = '';
+      if (d.occ === 8) tail = ' شكراً وتقديراً'; else if (d.occ === 14) tail = ' برّاً بالوالدين';
+      else if (d.occ === 16) tail = ' مع دعاء لمريض بالشفاء'; else if (d.occ === 17) tail = ' حمداً لله على السلامة';
+      else if (o && d.occ !== 0) tail = ' بمناسبة '+esc(o);
+      return 'أُهدي تبرّع'+p+tail;
+    }
+    function key(d){ return (isGift(d)?'g':'d')+'|'+(d.project||'')+'|'+(d.occ||'')+'|'+(d.amount||'')+'|'+new Date(d.time).getTime(); }
     function fmt(n){ return Number(n).toLocaleString('en-US')+' ريال'; }
     function ago(t){ var m=Math.max(0,Math.round((Date.now()-new Date(t))/60000)); if(m>CFG.timeMaxMin) return ''; if(m<1) return 'الآن'; return 'قبل '+m+' دقيقة'; }
     function urgent(d){ return !!(CFG.urgentWord && d.project && d.project.indexOf(CFG.urgentWord)>-1); }
-    function rank(a,b){ var ua=urgent(a)?1:0, ub=urgent(b)?1:0; if(ua!==ub) return ub-ua; var am=Number(a.amount)||0, bm=Number(b.amount)||0; if(am!==bm) return bm-am; return new Date(b.time)-new Date(a.time); }
+    function rank(a,b){ var ua=(!isGift(a)&&urgent(a))?1:0, ub=(!isGift(b)&&urgent(b))?1:0; if(ua!==ub) return ub-ua; return new Date(b.time)-new Date(a.time); }
     function nm(d){ return CFG.showName && d.name ? d.name : 'فاعل خير'; }
     function compute(){
       var now = Date.now();
-      var ok = DON.filter(function(d){ return d && d.time && (Number(d.amount)||0) >= CFG.minAmount; });
+      var ok = DON.filter(function(d){ return d && d.time && (Number(d.amount)||0) >= CFG.minAmount; })
+        .concat(GIFTS.filter(function(d){ return isGift(d) && d.time; }));
       items = ok.filter(function(d){ return (now-new Date(d.time)) < CFG.maxAgeHours*3600000; }).sort(rank);
       pastMode = false;
       if (!items.length && CFG.fallback){
@@ -181,25 +200,36 @@
       }
     }
     /* --- الصندوق (الرئيسية) --- */
-    function card(d){ return el('div','hm-live-item','<span class="hm-live-av">🤲</span><span class="hm-live-txt"><b>'+esc(nm(d))+'</b> تبرّع'+(d.project?' لـ <b>'+esc(d.project)+'</b>':'')+'</span>'+
-      (CFG.hideAmount||!d.amount?'':'<span class="hm-live-amt">'+fmt(d.amount)+'</span>')+(pastMode||!ago(d.time)?'':'<span class="hm-live-time">'+ago(d.time)+'</span>')); }
+    function card(d){
+      var c;
+      if (isGift(d)) c = el('div','hm-live-item','<span class="hm-live-av">'+(d.dead?'🤲':'🎁')+'</span><span class="hm-live-txt">'+giftTxt(d)+'</span>'+
+        (pastMode||!ago(d.time)?'':'<span class="hm-live-time">'+ago(d.time)+'</span>'));
+      else c = el('div','hm-live-item','<span class="hm-live-av">🤲</span><span class="hm-live-txt"><b>'+esc(nm(d))+'</b> تبرّع'+(d.project?' لـ <b>'+esc(d.project)+'</b>':'')+'</span>'+
+        (CFG.hideAmount||!d.amount?'':'<span class="hm-live-amt">'+fmt(d.amount)+'</span>')+(pastMode||!ago(d.time)?'':'<span class="hm-live-time">'+ago(d.time)+'</span>'));
+      c.setAttribute('data-k', key(d));
+      return c;
+    }
+    function addTop(d){ var c = card(d), k = c.getAttribute('data-k'), old = list.querySelectorAll('.hm-live-item');
+      for (var q=0;q<old.length;q++){ if (old[q].getAttribute('data-k')===k) old[q].parentNode.removeChild(old[q]); }
+      list.prepend(c); }
     function renderBox(){
       if (!box){ box = el('section','hm-live'); box.setAttribute('dir','rtl');
-        box.innerHTML='<div class="hm-live-box"><div class="hm-live-head"><span class="hm-pulse"></span><h3>آخر التبرعات</h3></div><div class="hm-live-list"></div><div class="hm-live-cta"><a href="'+esc(CFG.donateLink)+'">شارك أهل الخير وتبرّع الآن</a></div></div>';
+        box.innerHTML='<div class="hm-live-box"><div class="hm-live-head"><span class="hm-pulse"></span><h3>آخر التبرعات والإهداءات</h3></div><div class="hm-live-list"></div><div class="hm-live-cta"><a href="'+esc(CFG.donateLink)+'">شارك أهل الخير وتبرّع الآن</a></div></div>';
         if (CFG._afterReviews) CFG._afterReviews.parentNode.insertBefore(box, CFG._afterReviews); else mount(CFG.donationsTarget === 'after-reviews' ? 'footer' : CFG.donationsTarget, box);
         list = box.querySelector('.hm-live-list'); head = box.querySelector('h3');
         list.parentNode.addEventListener('mouseenter',function(){clearInterval(timer);}); list.parentNode.addEventListener('mouseleave',renderBox); }
-      clearInterval(timer); list.innerHTML=''; head.textContent = pastMode ? 'من تبرعات الأيام الماضية' : 'آخر التبرعات';
-      if (!items.length){ list.innerHTML='<p class="hm-live-empty">كن أول المتبرعين اليوم 🤍</p>'; return; }
-      var n=Math.min(CFG.show, items.length); for(var i=n-1;i>=0;i--) list.prepend(card(items[i])); ptr=n%items.length;
-      if (items.length>CFG.show) timer=setInterval(function(){ list.prepend(card(items[ptr])); ptr=(ptr+1)%items.length; while(list.children.length>CFG.show) list.removeChild(list.lastChild); }, CFG.rotateMs);
+      clearInterval(timer); list.innerHTML=''; head.textContent = pastMode ? 'من تبرعات وإهداءات الأيام الماضية' : 'آخر التبرعات والإهداءات';
+      if (!items.length){ list.innerHTML='<p class="hm-live-empty">كن أول من يتبرّع أو يُهدي اليوم 🤍</p>'; return; }
+      var n=Math.min(CFG.show, items.length); for(var i=n-1;i>=0;i--) addTop(items[i]); ptr=n%items.length;
+      if (items.length>CFG.show) timer=setInterval(function(){ addTop(items[ptr]); ptr=(ptr+1)%items.length; while(list.children.length>CFG.show) list.removeChild(list.lastChild); }, CFG.rotateMs);
     }
     /* --- الإشعار (الداخلية) --- */
     var toastEl, toastTimer, count = 0, started = false;
     function showToast(d){
       if (!toastEl){ toastEl = el('div','hm-toast'); toastEl.setAttribute('role','status'); document.body.appendChild(toastEl); }
-      var sub = []; if (d.city) sub.push('📍 '+esc(d.city)); sub.push(esc(CFG.orgName)); if (!pastMode && ago(d.time)) sub.push(ago(d.time));
-      toastEl.innerHTML = '<span class="hm-toast-ic">🤲</span><div class="hm-toast-body"><div class="hm-toast-t"><b>'+esc(nm(d))+'</b> تبرّع'+(CFG.hideAmount||!d.amount?'':' بـ <b>'+fmt(d.amount)+'</b>')+(d.project?' لـ <b>'+esc(d.project)+'</b>':'')+'</div><div class="hm-toast-s">'+sub.join(' <span>•</span> ')+'</div></div>'+
+      var sub = []; if (d.city && !isGift(d)) sub.push('📍 '+esc(d.city)); sub.push(esc(CFG.orgName)); if (!pastMode && ago(d.time)) sub.push(ago(d.time));
+      var g = isGift(d), tt = g ? giftTxt(d) : '<b>'+esc(nm(d))+'</b> تبرّع'+(CFG.hideAmount||!d.amount?'':' بـ <b>'+fmt(d.amount)+'</b>')+(d.project?' لـ <b>'+esc(d.project)+'</b>':'');
+      toastEl.innerHTML = '<span class="hm-toast-ic'+(g&&!d.dead?' hm-gift-pulse':'')+'">'+(g&&!d.dead?'🎁':'🤲')+'</span><div class="hm-toast-body"><div class="hm-toast-t">'+tt+'</div><div class="hm-toast-s">'+sub.join(' <span>•</span> ')+'</div></div>'+
         '<button class="hm-toast-x" aria-label="إغلاق">✕</button><span class="hm-toast-bar" style="animation-duration:'+CFG.toastStay+'ms"></span>';
       toastEl.querySelector('.hm-toast-x').onclick = function(){ toastEl.classList.remove('show'); count = CFG.toastMax; };
       requestAnimationFrame(function(){ toastEl.classList.add('show'); });
@@ -209,10 +239,20 @@
       if (started || !items.length) return; started = true; var i = 0;
       (function next(){ if (count>=CFG.toastMax) return; if (!document.hidden){ showToast(items[i%items.length]); i++; count++; } setTimeout(next, CFG.toastEvery); })();
     }
+    function show(){ compute(); home ? renderBox() : (setTimeout(runToasts, started?0:CFG.toastFirst)); }
     function load(){
-      fetch(CFG.dataUrl, {cache:'no-store'}).then(function(r){ return r.json(); }).then(function(j){ DON = Array.isArray(j)?j:(j.data||[]); compute(); home ? renderBox() : (setTimeout(runToasts, started?0:CFG.toastFirst)); }).catch(function(){});
+      fetch(CFG.dataUrl, {cache:'no-store'}).then(function(r){ return r.json(); }).then(function(j){ DON = Array.isArray(j)?j:(j.data||[]); show(); }).catch(function(){});
+    }
+    function loadGifts(){
+      if (!CFG.giftFeedUrl) return;
+      fetch(CFG.giftFeedUrl, {cache:'no-store'}).then(function(r){ return r.json(); }).then(function(j){
+        var a = Array.isArray(j)?j:(j.data||[]);
+        GIFTS = a.filter(function(d){ return d && d.t === 'gift'; }).map(function(d){ return {t:'gift', project:String(d.project||''), occ:+d.occ||0, dead:d.dead?1:0, time:d.time}; });
+        show();
+      }).catch(function(){});
     }
     load(); setInterval(load, CFG.refreshMs);
+    loadGifts(); setInterval(loadGifts, CFG.giftRefreshMs);
   }
 
   function init(){ try { buildReviews(); } catch(e){} try { buildDonations(); } catch(e){} }
@@ -354,4 +394,38 @@
     g.async = true;
     (document.head || document.documentElement).appendChild(g);
   } catch (e) { /* لا يوقف باقي الودجات */ }
+})();
+
+/* HM-HAMZA 2026-11-13: تصحيح نصوص الثيم (همزات وخطأ إملائي). يبدّل النص فقط إن طابق النص الخاطئ تماماً،
+   على عناصر بلا أبناء داخل a أو button أو عناوين التقييمات، وعلى placeholder. يراقب الصفحة 30 ثانية ثم يتوقف. */
+(function(){
+  var FIX = {
+    'تبرع الان': 'تبرع الآن',
+    'ادخل مبلغ آخر': 'أدخل مبلغاً آخر',
+    'اضف تقييم': 'أضف تقييماً',
+    'ارسل تعلقيك': 'أرسل تعليقك'
+  };
+  function norm(t){ return String(t||'').replace(/\s+/g,' ').replace(/^\s+|\s+$/g,''); }
+  function run(){
+    try{
+      var els = document.querySelectorAll('a span, button span, a, button, .r--title-form span, [class*="review"] span');
+      for (var i=0;i<els.length;i++){
+        var e = els[i]; if (e.children.length) continue;
+        var t = norm(e.textContent);
+        if (FIX.hasOwnProperty(t)) e.textContent = FIX[t];
+      }
+      var ins = document.querySelectorAll('input[placeholder],textarea[placeholder]');
+      for (var j=0;j<ins.length;j++){
+        var p = norm(ins[j].getAttribute('placeholder'));
+        if (FIX.hasOwnProperty(p)) ins[j].setAttribute('placeholder', FIX[p]);
+      }
+    }catch(err){}
+  }
+  run();
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run);
+  if (window.MutationObserver){
+    var busy = false, mo = new MutationObserver(function(){ if (busy) return; busy = true; setTimeout(function(){ busy = false; run(); }, 150); });
+    mo.observe(document.documentElement, {childList:true, subtree:true});
+    setTimeout(function(){ try{ mo.disconnect(); }catch(e){} }, 30000);
+  }
 })();
