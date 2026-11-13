@@ -336,3 +336,22 @@
   function run(){ if(hasCurrent()) return; var c=read(); if(c && c.css) apply(c.css); if(!c || !c.css || (Date.now()-c.t)>TTL) refresh(); }
   if(document.head && document.querySelector('style')) run(); else document.addEventListener('DOMContentLoaded', run);
 })();
+
+/* أهدِ من تحب — يحمّل gift.js من نفس الـcommit */
+(function () {
+  try {
+    var s = document.currentScript && document.currentScript.src;
+    if (!s) {
+      var all = document.getElementsByTagName('script');
+      for (var i = all.length - 1; i >= 0; i--) {
+        if (/hamah-widgets[^\/]*\/hamah-widgets\.js/.test(all[i].src || '')) { s = all[i].src; break; }
+      }
+    }
+    if (!s || window.__hmGiftLoad) return;
+    window.__hmGiftLoad = 1;
+    var g = document.createElement('script');
+    g.src = s.split('?')[0].replace(/hamah-widgets\.js$/, 'gift.js');
+    g.async = true;
+    (document.head || document.documentElement).appendChild(g);
+  } catch (e) { /* لا يوقف باقي الودجات */ }
+})();
