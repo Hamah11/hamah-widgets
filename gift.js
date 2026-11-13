@@ -115,11 +115,13 @@
   var NS = [5.03, 6.18, 7.09];   // حجم الاسم في المعاينة بوحدة cqw (= 44 و54 و62 من 874)
 
   var ICON = '<svg class="hmg-ic" viewBox="0 0 32 32" aria-hidden="true" focusable="false">' +
-    '<rect x="5" y="14" width="22" height="14" rx="2.2" fill="#c9aa77"/>' +
-    '<rect x="3" y="9" width="26" height="6" rx="1.8" fill="#A8864A"/>' +
-    '<rect x="14" y="9" width="4" height="19" fill="#126762"/>' +
-    '<path d="M16 9C13.6 4.6 8.6 3.4 7.6 5.8 6.6 8.2 10.4 9 16 9ZM16 9C18.4 4.6 23.4 3.4 24.4 5.8 25.4 8.2 21.6 9 16 9Z" fill="none" stroke="#126762" stroke-width="2" stroke-linejoin="round"/>' +
+    '<rect x="5" y="14" width="22" height="14" rx="2.2" fill="#E53935"/>' +
+    '<rect x="3" y="9" width="26" height="6" rx="1.8" fill="#C62828"/>' +
+    '<rect x="14" y="9" width="4" height="19" fill="#F5B52A"/>' +
+    '<path d="M16 9C13.6 4.6 8.6 3.4 7.6 5.8 6.6 8.2 10.4 9 16 9ZM16 9C18.4 4.6 23.4 3.4 24.4 5.8 25.4 8.2 21.6 9 16 9Z" fill="none" stroke="#F5B52A" stroke-width="2" stroke-linejoin="round"/>' +
     '</svg>';
+  var ICON_I = ICON.replace('class="hmg-ic"', 'class="hmg-ici"');
+  function teEl(e) { var s = h('span', 'hmg-te'); if (e === '🎁') s.innerHTML = ICON_I; else s.textContent = e; return s; }
 
   var ERR = {
     not_paid: 'لم يتأكد الدفع بعد. انتظر دقيقة ثم أعد المحاولة.',
@@ -317,9 +319,11 @@
         ';direction:rtl' + I + ';background:#fff' + I + ';color:' + C1 + I + ';border:1.5px solid ' + C1 + I +
         ';padding:4px 16px' + I + ';text-decoration:none' + I + ';font-family:' + FONT + I + ';white-space:nowrap' + I +
         ';box-sizing:border-box' + I + ';cursor:pointer;line-height:1.2' + I + ';margin:0' + I + '}',
+      '.hmg-pbtn:hover,.hmg-pbtn:focus,.hmg-pbtn:active,.hmg-clink:hover,.hmg-clink:focus,.hmg-clink:active{background:#fff' + I + ';color:' + C1 + I + '}',
       '.hmg-pbtn{animation:hmg-glow 2.6s ease-in-out infinite}',
       '.hmg-pbtn .hmg-ic{width:30px;height:30px;flex:0 0 30px}',
       '.hmg-clink .hmg-ic{width:28px;height:28px;flex:0 0 28px}',
+      '.hmg-ici{display:inline-block;width:20px;height:20px;vertical-align:-4px;margin-inline-end:6px}',
       '.hmg-ic{display:block;transform-origin:50% 80%;animation:hmg-hop 2.6s ease-in-out infinite}',
       '.hmg-clink{display:flex' + I + ';margin:8px auto 0' + I + ';max-width:100%' + I + '}',
       '.hmg-clink:hover,.hmg-clink:focus{box-shadow:0 0 0 4px rgba(18,103,98,.16)' + I + '}',
@@ -925,7 +929,7 @@
           if (opts.withAmount) saveState(st);
           go(2);
         });
-        add(t, h('span', 'hmg-te', OCC[i].e), h('span', '', short(i)));
+        add(t, teEl(OCC[i].e), h('span', '', short(i)));
         return t;
       }
       var g = h('div', 'hmg-grid');

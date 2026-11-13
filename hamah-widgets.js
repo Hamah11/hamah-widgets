@@ -105,10 +105,11 @@
 .hm-live-cta a{display:inline-block;background:var(--c);color:#fff;text-decoration:none;padding:12px 32px;border-radius:40px;font-size:16px;transition:.3s}\
 .hm-live-empty{color:#777;text-align:center;padding:30px 0;font-size:15px}\
 @media(max-width:600px){.hm-live-item{flex-wrap:wrap}.hm-live-time{width:100%;margin:4px 0 0;text-align:left}}\
-.hm-toast{position:fixed;bottom:24px;left:24px;z-index:99999;direction:rtl;font-family:'+CFG.font+';display:flex;align-items:center;gap:14px;background:#fff;border-radius:18px;padding:14px 18px 14px 34px;min-width:300px;max-width:min(420px,calc(100vw - 48px));box-shadow:0 10px 30px rgba(0,0,0,.14);border-right:5px solid '+CFG.color+';transform:translateY(140%);opacity:0;transition:transform .55s cubic-bezier(.2,.9,.3,1.2),opacity .4s}\
+.hm-toast{position:fixed;bottom:24px;left:24px;z-index:99999;direction:rtl;font-family:'+CFG.font+';display:flex;align-items:center;gap:14px;background:#fff;border-radius:18px;padding:14px 18px 14px 34px;min-width:300px;max-width:min(420px,calc(100vw - 48px));box-shadow:0 10px 30px rgba(0,0,0,.14);border-right:5px solid '+CFG.color+';overflow:hidden;transform:translateY(140%);opacity:0;transition:transform .55s cubic-bezier(.2,.9,.3,1.2),opacity .4s}\
 .hm-toast.show{transform:none;opacity:1}\
 .hm-gift-pulse{animation:hmGiftP 2.4s ease-in-out infinite}@keyframes hmGiftP{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}\
 .hm-toast-ic{width:48px;height:48px;border-radius:50%;background:#e6f4f1;display:grid;place-items:center;font-size:22px;flex:0 0 48px}\
+.hm-gsvg{width:28px;height:28px;display:block}.hm-live-av-g{background:#FFF1E0}.hm-toast-ic.hm-gift-pulse{background:#FFF1E0}\
 .hm-toast-body{flex:1;min-width:0}.hm-toast-t{color:#222;font-size:15px;line-height:1.5;font-weight:500}.hm-toast-t b{color:'+CFG.color+';font-weight:700}\
 .hm-toast-s{color:#8a8a8a;font-size:12px;margin-top:3px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}\
 .hm-toast-x{position:absolute;top:6px;left:8px;border:0;background:none;color:#bbb;font-size:16px;cursor:pointer;padding:2px 6px;line-height:1}\
@@ -173,6 +174,7 @@
     if (!CFG.donationsEnabled || !CFG.dataUrl) return;
     var p = path(); if (CFG.skipPaths.some(function(s){ return p.indexOf(s)===0; })) return;
     var home = isHome(), DON = [], GIFTS = [], items = [], pastMode = false, ptr = 0, timer, box, list, head;
+    var GIFT_IC = '<svg class="hm-gsvg" viewBox="0 0 32 32" aria-hidden="true"><rect x="5" y="14" width="22" height="14" rx="2.2" fill="#E53935"/><rect x="3" y="9" width="26" height="6" rx="1.8" fill="#C62828"/><rect x="14" y="9" width="4" height="19" fill="#F5B52A"/><path d="M16 9C13.6 4.6 8.6 3.4 7.6 5.8 6.6 8.2 10.4 9 16 9ZM16 9C18.4 4.6 23.4 3.4 24.4 5.8 25.4 8.2 21.6 9 16 9Z" fill="none" stroke="#F5B52A" stroke-width="2" stroke-linejoin="round"/></svg>';
     function isGift(d){ return d && d.t === 'gift'; }
     function giftTxt(d){
       var p = d.project ? ' في «<b>'+esc(d.project)+'</b>»' : '';
@@ -181,7 +183,7 @@
       if (d.occ === 8) tail = ' شكراً وتقديراً'; else if (d.occ === 14) tail = ' برّاً بالوالدين';
       else if (d.occ === 16) tail = ' مع دعاء لمريض بالشفاء'; else if (d.occ === 17) tail = ' حمداً لله على السلامة';
       else if (o && d.occ !== 0) tail = ' بمناسبة '+esc(o);
-      return 'أُهدي تبرّع'+p+tail;
+      return 'أهدى فاعل خير أجر تبرّعه'+p+tail;
     }
     function key(d){ return (isGift(d)?'g':'d')+'|'+(d.project||'')+'|'+(d.occ||'')+'|'+(d.amount||'')+'|'+new Date(d.time).getTime(); }
     function fmt(n){ return Number(n).toLocaleString('en-US')+' ريال'; }
@@ -202,7 +204,7 @@
     /* --- الصندوق (الرئيسية) --- */
     function card(d){
       var c;
-      if (isGift(d)) c = el('div','hm-live-item','<span class="hm-live-av">'+(d.dead?'🤲':'🎁')+'</span><span class="hm-live-txt">'+giftTxt(d)+'</span>'+
+      if (isGift(d)) c = el('div','hm-live-item','<span class="hm-live-av'+(d.dead?'':' hm-live-av-g')+'">'+(d.dead?'🤲':GIFT_IC)+'</span><span class="hm-live-txt">'+giftTxt(d)+'</span>'+
         (pastMode||!ago(d.time)?'':'<span class="hm-live-time">'+ago(d.time)+'</span>'));
       else c = el('div','hm-live-item','<span class="hm-live-av">🤲</span><span class="hm-live-txt"><b>'+esc(nm(d))+'</b> تبرّع'+(d.project?' لـ <b>'+esc(d.project)+'</b>':'')+'</span>'+
         (CFG.hideAmount||!d.amount?'':'<span class="hm-live-amt">'+fmt(d.amount)+'</span>')+(pastMode||!ago(d.time)?'':'<span class="hm-live-time">'+ago(d.time)+'</span>'));
@@ -229,7 +231,7 @@
       if (!toastEl){ toastEl = el('div','hm-toast'); toastEl.setAttribute('role','status'); document.body.appendChild(toastEl); }
       var sub = []; if (d.city && !isGift(d)) sub.push('📍 '+esc(d.city)); sub.push(esc(CFG.orgName)); if (!pastMode && ago(d.time)) sub.push(ago(d.time));
       var g = isGift(d), tt = g ? giftTxt(d) : '<b>'+esc(nm(d))+'</b> تبرّع'+(CFG.hideAmount||!d.amount?'':' بـ <b>'+fmt(d.amount)+'</b>')+(d.project?' لـ <b>'+esc(d.project)+'</b>':'');
-      toastEl.innerHTML = '<span class="hm-toast-ic'+(g&&!d.dead?' hm-gift-pulse':'')+'">'+(g&&!d.dead?'🎁':'🤲')+'</span><div class="hm-toast-body"><div class="hm-toast-t">'+tt+'</div><div class="hm-toast-s">'+sub.join(' <span>•</span> ')+'</div></div>'+
+      toastEl.innerHTML = '<span class="hm-toast-ic'+(g&&!d.dead?' hm-gift-pulse':'')+'">'+(g&&!d.dead?GIFT_IC:'🤲')+'</span><div class="hm-toast-body"><div class="hm-toast-t">'+tt+'</div><div class="hm-toast-s">'+sub.join(' <span>•</span> ')+'</div></div>'+
         '<button class="hm-toast-x" aria-label="إغلاق">✕</button><span class="hm-toast-bar" style="animation-duration:'+CFG.toastStay+'ms"></span>';
       toastEl.querySelector('.hm-toast-x').onclick = function(){ toastEl.classList.remove('show'); count = CFG.toastMax; };
       requestAnimationFrame(function(){ toastEl.classList.add('show'); });
