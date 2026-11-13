@@ -405,6 +405,8 @@
     'اضف تقييم': 'أضف تقييماً',
     'ارسل تعلقيك': 'أرسل تعليقك'
   };
+  var DESC_OLD = 'لتوثيق مساهمتك، أرسل إيصال التحويل عبر واتساب، ويمكنك طلب الإهداء من خلاله.';
+  var DESC_NEW = 'لتوثيق مساهمتك، أرسل إيصال التحويل عبر واتساب. ولإهداء أجر تبرعك اضغط زر «أهدِ من تحب»، وإن تبرعت بالتحويل البنكي فاطلب الإهداء عبر واتساب.';
   function norm(t){ return String(t||'').replace(/\s+/g,' ').replace(/^\s+|\s+$/g,''); }
   function run(){
     try{
@@ -413,6 +415,12 @@
         var e = els[i]; if (e.children.length) continue;
         var t = norm(e.textContent);
         if (FIX.hasOwnProperty(t)) e.textContent = FIX[t];
+      }
+      // جملة الإهداء في أوصاف المشاريع (عرض فقط، الوصف المحفوظ في زد لا يتغير)
+      var ds = document.querySelectorAll('strong, span, p, td');
+      for (var d=0; d<ds.length; d++){
+        var de = ds[d]; if (de.children.length) continue;
+        if (norm(de.textContent) === DESC_OLD) de.textContent = DESC_NEW;
       }
       var ins = document.querySelectorAll('input[placeholder],textarea[placeholder]');
       for (var j=0;j<ins.length;j++){
