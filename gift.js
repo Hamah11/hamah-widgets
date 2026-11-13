@@ -114,14 +114,14 @@
   var TOP6 = [0, 14, 15, 16, 9, 3];
   var NS = [5.03, 6.18, 7.09];   // حجم الاسم في المعاينة بوحدة cqw (= 44 و54 و62 من 874)
 
-  var ICON = '<svg class="hmg-ic" viewBox="0 0 32 32" aria-hidden="true" focusable="false">' +
-    '<rect x="5" y="14" width="22" height="14" rx="2.2" fill="#E53935"/>' +
+  // أيقونة الهدية: صندوق أحمر بشريط وفيونكة ذهبية
+  var ICON_BODY = '<rect x="5" y="14" width="22" height="14" rx="2.2" fill="#E53935"/>' +
     '<rect x="3" y="9" width="26" height="6" rx="1.8" fill="#C62828"/>' +
     '<rect x="14" y="9" width="4" height="19" fill="#F5B52A"/>' +
     '<path d="M16 9C13.6 4.6 8.6 3.4 7.6 5.8 6.6 8.2 10.4 9 16 9ZM16 9C18.4 4.6 23.4 3.4 24.4 5.8 25.4 8.2 21.6 9 16 9Z" fill="none" stroke="#F5B52A" stroke-width="2" stroke-linejoin="round"/>' +
-    '</svg>';
-  var ICON_I = ICON.replace('class="hmg-ic"', 'class="hmg-ici"');
-  function teEl(e) { var s = h('span', 'hmg-te'); if (e === '🎁') s.innerHTML = ICON_I; else s.textContent = e; return s; }
+    '';
+  var ICON = '<svg class="hmg-ic" viewBox="0 0 32 32" aria-hidden="true" focusable="false">' + ICON_BODY + '</svg>';
+  var ICON_S = '<svg class="hmg-ic2" viewBox="0 0 32 32" aria-hidden="true" focusable="false">' + ICON_BODY + '</svg>';
 
   var ERR = {
     not_paid: 'لم يتأكد الدفع بعد. انتظر دقيقة ثم أعد المحاولة.',
@@ -319,11 +319,11 @@
         ';direction:rtl' + I + ';background:#fff' + I + ';color:' + C1 + I + ';border:1.5px solid ' + C1 + I +
         ';padding:4px 16px' + I + ';text-decoration:none' + I + ';font-family:' + FONT + I + ';white-space:nowrap' + I +
         ';box-sizing:border-box' + I + ';cursor:pointer;line-height:1.2' + I + ';margin:0' + I + '}',
-      '.hmg-pbtn:hover,.hmg-pbtn:focus,.hmg-pbtn:active,.hmg-clink:hover,.hmg-clink:focus,.hmg-clink:active{background:#fff' + I + ';color:' + C1 + I + '}',
       '.hmg-pbtn{animation:hmg-glow 2.6s ease-in-out infinite}',
       '.hmg-pbtn .hmg-ic{width:30px;height:30px;flex:0 0 30px}',
       '.hmg-clink .hmg-ic{width:28px;height:28px;flex:0 0 28px}',
-      '.hmg-ici{display:inline-block;width:20px;height:20px;vertical-align:-4px;margin-inline-end:6px}',
+      '.hmg-ic2{display:inline-block;width:1.3em;height:1.3em;vertical-align:-.28em;margin-left:6px}',
+      '.hmg-te .hmg-ic2{width:32px;height:32px;margin:0;vertical-align:0}',
       '.hmg-ic{display:block;transform-origin:50% 80%;animation:hmg-hop 2.6s ease-in-out infinite}',
       '.hmg-clink{display:flex' + I + ';margin:8px auto 0' + I + ';max-width:100%' + I + '}',
       '.hmg-clink:hover,.hmg-clink:focus{box-shadow:0 0 0 4px rgba(18,103,98,.16)' + I + '}',
@@ -929,7 +929,9 @@
           if (opts.withAmount) saveState(st);
           go(2);
         });
-        add(t, teEl(OCC[i].e), h('span', '', short(i)));
+        var te = h('span', 'hmg-te', i === 0 ? '' : OCC[i].e);
+        if (i === 0) te.insertAdjacentHTML('afterbegin', ICON_S);
+        add(t, te, h('span', '', short(i)));
         return t;
       }
       var g = h('div', 'hmg-grid');
@@ -1417,7 +1419,9 @@
       w.appendChild(h('div', 'hmg-small hmg-center', 'الحد بطاقتان لكل تبرع.'));
     } else {
       w.appendChild(h('div', 'hmg-small hmg-center', 'ويمكنك إهداء شخص ثانٍ من نفس التبرع:'));
-      w.appendChild(btn('hmg-pri', '🎁 بطاقة ثانية لشخص آخر', function () { second(ov, c, done); }));
+      var b2 = btn('hmg-pri', 'بطاقة ثانية لشخص آخر', function () { second(ov, c, done); });
+      b2.insertAdjacentHTML('afterbegin', ICON_S);
+      w.appendChild(b2);
     }
     w.appendChild(h('div', 'hmg-foot', ' '));
   }
@@ -1635,7 +1639,9 @@
     w.appendChild(edWrap);
 
     if (done.c.length < 2) {
-      w.appendChild(btn('hmg-link', '🎁 بطاقة ثانية لشخص آخر (بلا تبرع جديد)', function () { second(ov, c, doneFor(c) || done); }));
+      var b3 = btn('hmg-link', 'بطاقة ثانية لشخص آخر (بلا تبرع جديد)', function () { second(ov, c, doneFor(c) || done); });
+      b3.insertAdjacentHTML('afterbegin', ICON_S);
+      w.appendChild(b3);
     }
     var foot = h('div', 'hmg-foot');
     add(foot, h('span', '', 'تُرسل من واتسابك أنت، لا من رقم الجمعية. رابط البطاقة يعمل 90 يوماً، فاحفظ الصورة. · الرمز '),
@@ -1690,7 +1696,8 @@
       var g = document.createElement('a');
       g.className = 'hmg-link';
       g.href = p ? '/products/' + encodeURIComponent(p) + '#hadiya-open' : '/';
-      g.textContent = '🎁 أهدِ أنت أيضاً لمن تحب';
+      g.textContent = 'أهدِ أنت أيضاً لمن تحب';
+      g.insertAdjacentHTML('afterbegin', ICON_S);
       g.addEventListener('click', function () { ev('recipient_gift'); ov.close(); });
       w.appendChild(g);
       footer(w, code);
