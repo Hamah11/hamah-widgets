@@ -122,6 +122,9 @@
     '';
   var ICON = '<svg class="hmg-ic" viewBox="0 0 32 32" aria-hidden="true" focusable="false">' + ICON_BODY + '</svg>';
   var ICON_S = '<svg class="hmg-ic2" viewBox="0 0 32 32" aria-hidden="true" focusable="false">' + ICON_BODY + '</svg>';
+  // شعار واتساب: simple-icons 16.37.0 (CC0)
+  var WA_PATH = 'M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z';
+  function waIcon(c) { return '<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false"><path fill="' + c + '" d="' + WA_PATH + '"/></svg>'; }
 
   var ERR = {
     not_paid: 'لم يتأكد الدفع بعد. انتظر دقيقة ثم أعد المحاولة.',
@@ -428,6 +431,67 @@
       '.hmg-tbar button{width:34px' + I + ';height:34px' + I + ';border:0' + I + ';background:#F2F5F4' + I + ';border-radius:10px' + I + ';color:#33403D' + I + ';font-size:18px' + I + ';padding:0' + I + ';cursor:pointer}',
       '@media (prefers-reduced-motion:reduce){.hmg-pbtn,.hmg-ic,.hmg-pulse4,.hmg-sheet,.hmg-spin{animation:none' + I + '}}'
     ];
+    // تحسين النافذة (89): اللمس 44، والتباين، والتركيز، والمختار بعلامة. كل القواعد داخل .hmg-ov وبـ !important
+    var r2 = [
+      '.hmg-ov .hmg-head{padding:10px 10px 4px}',
+      '.hmg-ov h3.hmg-title{flex:1;margin:0;padding:0;border:0;background:none;text-align:center;font-size:19px;font-weight:800;line-height:1.4;color:' + C1 + ';text-transform:none}',
+      '.hmg-ov h3.hmg-title[tabindex]:focus{outline:none}',
+      '.hmg-ov .hmg-back,.hmg-ov .hmg-x{width:44px;height:44px;line-height:44px;flex:0 0 44px}',
+      '.hmg-ov .hmg-prog{font-size:12.5px;color:#5b6b80;padding:0 16px 6px}',
+      '.hmg-ov .hmg-body{padding-top:8px;scroll-padding-bottom:96px}',
+      '.hmg-ov .hmg-sub{font-size:14px;color:#5b6b80;text-align:center;margin:0 0 12px;line-height:1.6}',
+      '.hmg-ov .hmg-hint,.hmg-ov .hmg-pvl,.hmg-ov .hmg-after{font-size:12.5px;color:#5b6b80;line-height:1.6;margin:5px 0 0}',
+      '.hmg-ov .hmg-pvl{text-align:center;margin:10px 0 6px}',
+      '.hmg-ov .hmg-after{text-align:center;margin-top:8px}',
+      '.hmg-ov .hmg-pv62{width:62%;margin:0 auto}',
+      '.hmg-ov .hmg-small{color:#5b6b80}',
+      '.hmg-ov .hmg-link{display:flex;width:fit-content;max-width:100%;margin-inline:auto;min-height:44px;align-items:center;justify-content:center;padding:0 4px;color:' + C1 + ';text-decoration:underline;text-decoration-color:' + C2D + ';text-decoration-thickness:2px;text-underline-offset:4px}',
+      '.hmg-ov .hmg-more{width:100%;height:48px;margin:12px 0 0;border:0;border-radius:12px;background:#F0F8F4;color:' + C1 + ';font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 12px;cursor:pointer;box-shadow:none;text-decoration:none}',
+      '.hmg-ov .hmg-chk{min-height:44px;margin:4px 0 0}',
+      '.hmg-ov .hmg-chk input{width:22px;height:22px;flex:0 0 22px;-webkit-appearance:none;appearance:none;border:2px solid ' + C1 + ';border-radius:5px;background:#fff;cursor:pointer}',
+      '.hmg-ov .hmg-chk input:checked{background:' + C1 + ' url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27%3E%3Cpath d=%27M3 8.5l3 3 7-7%27 fill=%27none%27 stroke=%27white%27 stroke-width=%272.2%27/%3E%3C/svg%3E") center/16px no-repeat}',
+      '.hmg-ov .hmg-in,.hmg-ov .hmg-sel,.hmg-ov .hmg-ta{border:1px solid #667085}',
+      '.hmg-ov .hmg-in::placeholder,.hmg-ov .hmg-ta::placeholder{color:#667085;opacity:1}',
+      '.hmg-ov .hmg-in:focus,.hmg-ov .hmg-sel:focus,.hmg-ov .hmg-ta:focus{border:2px solid ' + C1 + ';box-shadow:0 0 0 3px ' + SEL + '}',
+      '.hmg-ov .hmg-in[aria-invalid="true"],.hmg-ov .hmg-sel[aria-invalid="true"]{border:2px solid #b42318}',
+      '.hmg-ov .hmg-ferr{font-size:13.5px;font-weight:700;color:#b42318;line-height:1.5;margin:5px 0 0;text-align:right}',
+      '.hmg-ov .hmg-err{color:#b42318}',
+      '.hmg-ov button,.hmg-ov a{touch-action:manipulation}',
+      '.hmg-ov button:focus-visible,.hmg-ov a:focus-visible,.hmg-ov input[type=checkbox]:focus-visible{outline:3px solid ' + C1 + ';outline-offset:2px}',
+      '.hmg-ov button:active{transform:scale(.98)}',
+      '.hmg-ov .hmg-tile,.hmg-ov .hmg-opt,.hmg-ov .hmg-mz{position:relative;border:1px solid ' + C2D + '}',
+      '.hmg-ov .hmg-dz{position:relative}',
+      '.hmg-ov .hmg-tile.on,.hmg-ov .hmg-opt.on,.hmg-ov .hmg-mz.on,.hmg-ov .hmg-dz.on{border:2px solid ' + C1 + ';background:' + SEL + ';color:' + C1 + '}',
+      '.hmg-ov .hmg-tile.on::after,.hmg-ov .hmg-opt.on::after,.hmg-ov .hmg-mz.on::after,.hmg-ov .hmg-dz.on::after{content:"✓";position:absolute;top:-7px;left:-7px;width:20px;height:20px;border-radius:50%;background:' + C1 + ';color:#fff;font-size:13px;font-weight:800;line-height:1;display:flex;align-items:center;justify-content:center;z-index:1;box-shadow:0 0 0 2px #fff}',
+      '.hmg-ov .hmg-pri{height:auto;min-height:54px;line-height:1.4;padding:6px 12px}',
+      '.hmg-ov .hmg-sec{height:auto;min-height:50px;gap:8px}',
+      '.hmg-ov .hmg-bar{margin-top:16px}',
+      '.hmg-ov .hmg-amtv{font-size:12.5px;color:#5b6b80}',
+      '.hmg-ov .hmg-foot{font-size:12.5px;color:#5b6b80;line-height:1.7}',
+      '.hmg-ov .hmg-rib{font-size:max(2.6cqw,11px)}',
+      '.hmg-ov .hmg-sum{background:#F0F8F4}',
+      '.hmg-ov .hmg-crow{display:flex;align-items:center;gap:12px;background:#F0F8F4;border-radius:12px;padding:10px;margin:14px 0 0}',
+      '.hmg-ov .hmg-crow img{width:96px;height:68px;flex:0 0 96px;border-radius:6px;object-fit:cover;display:block}',
+      '.hmg-ov .hmg-crt{flex:1 1 auto;min-width:0;line-height:1.5}',
+      '.hmg-ov .hmg-crt b{display:block;font-size:15px;color:' + C1 + '}',
+      '.hmg-ov .hmg-crt span{display:block;font-size:14px;color:#33403D;overflow-wrap:anywhere}',
+      '.hmg-ov .hmg-crow .hmg-link{margin:0;flex:0 0 auto}',
+      '.hmg-ov .hmg-msg{background:#F0F8F4;border-radius:12px;padding:10px 14px;margin:12px 0 0}',
+      '.hmg-ov .hmg-msgh{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px;color:#5b6b80;font-weight:700}',
+      '.hmg-ov .hmg-msgh .hmg-link{margin:-6px 0;font-size:14px}',
+      '.hmg-ov .hmg-msgt{font-size:14.5px;line-height:1.7;margin:2px 0 0;white-space:pre-line;color:#1C2226;overflow-wrap:anywhere}',
+      '.hmg-ov .hmg-msgl{font-size:13px;color:#5b6b80;margin:4px 0 0}',
+      '.hmg-ov .hmg-wa svg,.hmg-ov .hmg-thx svg{width:24px;height:24px;flex:0 0 24px;display:block}',
+      '.hmg-ov .hmg-thx{border-color:' + C2D + '}',
+      '.hmg-ov .hmg-r2{display:flex;gap:8px;margin:8px 0 0}',
+      '.hmg-ov .hmg-r2 .hmg-sec{flex:1 1 0;min-height:48px;margin:0;font-size:15px}',
+      '.hmg-ov .hmg-hr{border:0;border-top:1px solid #E3E8E6;margin:8px 0;height:0}',
+      '.hmg-ov .hmg-big{font-size:15px;font-weight:800;text-align:center;margin:14px 0 4px;line-height:1.7;color:#1C2226}',
+      '.hmg-ov .hmg-gl{font-size:14px;color:#5b6b80;text-align:center;line-height:1.6;margin:0 0 10px}',
+      '.hmg-ov .hmg-links{display:flex;justify-content:center;gap:22px;flex-wrap:wrap}',
+      '.hmg-ov .hmg-links .hmg-link{margin:4px 0 0}'
+    ];
+    for (var j = 0; j < r2.length; j++) r.push(r2[j].replace(/([^{};]+:[^;{}]+)(?=[;}])/g, '$1' + I));
     var st = h('style');
     st.id = 'hmg-css';
     st.textContent = r.join('\n');
@@ -446,11 +510,12 @@
 
   /* ======================= النافذة ======================= */
 
-  var openOv = null;
+  var openOv = null, ovN = 0;
   function overlay(title) {
     if (openOv) openOv.close();
     css();
     loadFonts();
+    var opener = document.activeElement;
     var root = h('div', 'hmg-ov');
     root.setAttribute('dir', 'rtl');
     var sh = h('div', 'hmg-sheet');
@@ -459,7 +524,10 @@
     var head = h('div', 'hmg-head');
     var back = btn('hmg-back', '→');
     back.setAttribute('aria-label', 'رجوع');
-    var tt = h('div', 'hmg-title', title);
+    var tt = h('h3', 'hmg-title', title);
+    tt.id = 'hmg-tt' + (++ovN);
+    tt.setAttribute('tabindex', '-1');
+    sh.setAttribute('aria-labelledby', tt.id);
     var x = btn('hmg-x', '×');
     x.setAttribute('aria-label', 'إغلاق');
     add(head, back, tt, x);
@@ -470,6 +538,7 @@
 
     var o = {root: root, body: body, closed: false, onBack: null, onClose: null};
     o.title = function (t) { tt.textContent = t; };
+    o.focusTitle = function () { try { tt.focus({preventScroll: true}); } catch (e) { tt.focus(); } };
     o.back = function (fn) { o.onBack = fn || null; back.style.visibility = fn ? 'visible' : 'hidden'; };
     o.progress = function (n, total) {
       prog.textContent = '';
@@ -484,25 +553,51 @@
       body.textContent = '';
       return function () { body.scrollTop = top; };
     };
-    function onKey(e) { if (e.key === 'Escape') o.close(); }
+    function focusables() {
+      return Array.prototype.filter.call(sh.querySelectorAll('button,a[href],input,select,textarea'), function (e) {
+        return !e.disabled && (e.offsetWidth || e.offsetHeight) && getComputedStyle(e).visibility !== 'hidden';
+      });
+    }
+    // من الصفحة كلها (بالالتقاط): التركيز قد يخرج من النافذة حين يتعطل زر
+    function onKey(e) {
+      if (o.closed) return;
+      if (e.key === 'Escape' || e.key === 'Esc') {
+        if (x.style.visibility !== 'hidden') { e.preventDefault(); o.close(); }
+        return;
+      }
+      if (e.key !== 'Tab') return;
+      var f = focusables(), a = document.activeElement;
+      if (!f.length) { e.preventDefault(); o.focusTitle(); return; }
+      var i = f.indexOf(a);
+      if (e.shiftKey) {
+        if (i <= 0) { e.preventDefault(); f[f.length - 1].focus(); }
+      } else if (a !== tt && (i < 0 || i === f.length - 1)) {
+        e.preventDefault();
+        f[0].focus();
+      }
+    }
     o.close = function () {
       if (o.closed) return;
       o.closed = true;
       clearInterval(timer);
       if (root.parentNode) root.parentNode.removeChild(root);
       document.documentElement.classList.remove('hmg-lock');
-      document.removeEventListener('keydown', onKey);
+      document.removeEventListener('keydown', onKey, true);
       if (openOv === o) openOv = null;
+      if (opener && opener.focus && opener !== document.body && document.documentElement.contains(opener)) {
+        try { opener.focus({preventScroll: true}); } catch (e) { /* لا شيء */ }
+      }
       if (o.onClose) { try { o.onClose(); } catch (e) { /* لا شيء */ } }
     };
     back.addEventListener('click', function () { if (o.onBack) o.onBack(); });
     x.addEventListener('click', function () { o.close(); });
     root.addEventListener('click', function (e) { if (e.target === root) o.close(); });
-    document.addEventListener('keydown', onKey);
+    document.addEventListener('keydown', onKey, true);
     o.back(null);
     o.progress(0);
     document.documentElement.appendChild(root);
     document.documentElement.classList.add('hmg-lock');
+    o.focusTitle();
     // زد يعيد رسم الصفحة أحياناً فيمسح النافذة: نعيدها ما لم يغلقها الزائر
     var timer = setInterval(function () {
       if (o.closed) return;
@@ -516,8 +611,47 @@
   function stickyBar(button) {
     var bar = h('div', 'hmg-bar');
     var err = h('div', 'hmg-err');
+    err.setAttribute('role', 'alert');
     add(bar, button, err);
     return {bar: bar, err: err, btn: button};
+  }
+
+  // مسار العنصر المركّز داخل الخطوة، لإرجاع التركيز إليه بعد إعادة الرسم
+  function focusPath(root) {
+    var a = document.activeElement, p = [];
+    if (!a || a === root || !root.contains(a)) return null;
+    while (a && a !== root) { p.unshift(Array.prototype.indexOf.call(a.parentNode.children, a)); a = a.parentNode; }
+    return p;
+  }
+  function refocus(root, p) {
+    var e = root;
+    for (var i = 0; i < p.length && e; i++) e = e.children[p[i]];
+    if (e && e.focus) { try { e.focus({preventScroll: true}); } catch (x) { e.focus(); } }
+    return !!e;
+  }
+  function pressed(root) {
+    var bs = root.querySelectorAll('.hmg-tile,.hmg-opt,.hmg-mz,.hmg-dz');
+    for (var i = 0; i < bs.length; i++) bs[i].setAttribute('aria-pressed', bs[i].classList.contains('on') ? 'true' : 'false');
+  }
+  // الخطأ تحت خانته
+  function clearErr(inp) {
+    if (!inp) return;
+    if (inp._err && inp._err.parentNode) inp._err.parentNode.removeChild(inp._err);
+    inp._err = null;
+    inp.removeAttribute('aria-invalid');
+    inp.removeAttribute('aria-describedby');
+  }
+  function fieldErr(inp, msg) {
+    clearErr(inp);
+    var e = h('div', 'hmg-ferr', msg);
+    e.setAttribute('role', 'alert');
+    e.id = (inp.id || 'hmg-f') + '-err';
+    inp.setAttribute('aria-invalid', 'true');
+    inp.setAttribute('aria-describedby', e.id);
+    inp.parentNode.insertBefore(e, inp.nextSibling);
+    inp._err = e;
+    try { inp.focus({preventScroll: true}); } catch (x) { inp.focus(); }
+    try { e.scrollIntoView({block: 'nearest'}); } catch (x) { /* لا شيء */ }
   }
 
   function waiting(ov, text) {
@@ -886,13 +1020,21 @@
     if (opts.withAmount) minAmount().then(function (m) { minA = m; });
 
     function go(n) { step = n; render(false); }
+    function stepTitle() {
+      if (step === 1) return 'ما مناسبة الهدية؟';
+      if (step === 2) return OCC[st.o].dead ? 'عن مَن تتصدق؟' : 'لمن الهدية؟';
+      return amounts && amounts.list.length ? 'كم تريد أن تتبرع؟' : 'بطاقتك';
+    }
     function render(keep) {
+      var path = keep ? focusPath(ov.body) : null;
       var restore = ov.clear(keep);
-      ov.title(opts.title || 'أهدِ من تحب');
+      ov.title(stepTitle());
       ov.progress(step, total);
       ov.back(step > 1 ? function () { go(step - 1); } : (opts.onBack || null));
       if (step === 1) s1(); else if (step === 2) s2(); else s3();
       restore();
+      pressed(ov.body);
+      if (!path || !refocus(ov.body, path)) ov.focusTitle();
     }
 
     function pick(i) {
@@ -907,10 +1049,16 @@
     function s1() {
       var w = ov.body;
       var errEl = h('div', 'hmg-err', opts.err || '');
+      errEl.setAttribute('role', 'alert');
       opts.err = '';
+      if (opts.withAmount) w.appendChild(h('div', 'hmg-sub', 'تتبرع باسمه، وتصلك بطاقة ترسلها له في واتساب.'));
+      var sel = null;
       if (opts.pickProject) {
-        w.appendChild(h('label', 'hmg-lbl', 'المشروع الذي تبرعت له'));
-        var sel = h('select', 'hmg-sel');
+        var pl = h('label', 'hmg-lbl', 'المشروع الذي تبرعت له');
+        pl.htmlFor = 'hmg-proj';
+        w.appendChild(pl);
+        sel = h('select', 'hmg-sel');
+        sel.id = 'hmg-proj';
         sel.appendChild(h('option', '', 'اختر المشروع')).value = '';
         for (var k in PROJECTS) {
           if (!PROJECTS.hasOwnProperty(k)) continue;
@@ -919,13 +1067,15 @@
           if (st.p === k) op.selected = true;
           sel.appendChild(op);
         }
-        sel.addEventListener('change', function () { st.p = sel.value; errEl.textContent = ''; });
+        sel.addEventListener('change', function () { st.p = sel.value; errEl.textContent = ''; clearErr(sel); });
         w.appendChild(sel);
+        errEl.className = 'hmg-ferr';
+        w.appendChild(errEl);
+        w.appendChild(h('div', 'hmg-lbl', ' '));
       }
-      w.appendChild(h('div', 'hmg-q', 'ما مناسبة الهدية؟'));
       function tile(i) {
         var t = btn('hmg-tile' + (st.oSet && st.o === i ? ' on' : ''), null, function () {
-          if (opts.pickProject && !st.p) { errEl.textContent = 'اختر المشروع الذي تبرعت له.'; return; }
+          if (opts.pickProject && !st.p) { errEl.textContent = ''; fieldErr(sel, 'اختر المشروع الذي تبرعت له.'); return; }
           pick(i);
           if (opts.withAmount) saveState(st);
           go(2);
@@ -939,43 +1089,51 @@
       TOP6.forEach(function (i) { g.appendChild(tile(i)); });
       w.appendChild(g);
       var rest = OCC.length - TOP6.length;
-      w.appendChild(btn('hmg-link', more ? 'إخفاء المناسبات الأخرى ▴' : 'مناسبات أخرى (' + rest + ') ▾', function () {
+      var mb = btn('hmg-more', more ? 'إخفاء المناسبات الأخرى ▴' : 'مناسبات أخرى (' + rest + ') ▾', function () {
         more = !more;
         render(true);
-      }));
+      });
+      mb.setAttribute('aria-expanded', more ? 'true' : 'false');
+      w.appendChild(mb);
       if (more) {
         var g2 = h('div', 'hmg-grid');
+        g2.style.marginTop = '12px';
         for (var i = 0; i < OCC.length; i++) if (TOP6.indexOf(i) < 0) g2.appendChild(tile(i));
         w.appendChild(g2);
       }
-      w.appendChild(errEl);
-      w.appendChild(h('div', 'hmg-small', ' '));
+      if (!opts.pickProject) w.appendChild(errEl);
+      var sp = h('div');
+      sp.style.height = '16px';
+      w.appendChild(sp);
     }
 
     function s2() {
       var w = ov.body;
       var o = OCC[st.o], dead = !!o.dead;
-      w.appendChild(h('div', 'hmg-q', dead ? 'عن من الصدقة؟' : 'لمن الهدية؟'));
-      var pv = preview(st, 'معاينة');
-      var pw = h('div', 'hmg-pv78');
-      pw.appendChild(pv);
-      w.appendChild(pw);
-
-      w.appendChild(h('label', 'hmg-lbl', dead ? 'اسم المتوفى' : 'اسم من تهديه'));
+      var l1 = h('label', 'hmg-lbl', dead ? 'اسم المتوفى' : 'اسم من تهديه');
+      l1.htmlFor = 'hmg-to';
+      w.appendChild(l1);
       var inTo = h('input', 'hmg-in');
+      inTo.id = 'hmg-to';
       inTo.type = 'text';
       inTo.maxLength = 40;
       inTo.autocomplete = 'off';
+      inTo.setAttribute('enterkeyhint', 'next');
       inTo.placeholder = 'مثال: ' + (dead ? 'محمد' : 'أبو تميم');
       inTo.value = st.to;
       w.appendChild(inTo);
+      w.appendChild(h('div', 'hmg-hint', 'حروف فقط، حتى 25 حرفاً.'));
 
       var femBtns = null;
       if (hasFem(st.o)) {
-        w.appendChild(h('label', 'hmg-lbl', dead ? 'المتوفى:' : 'المُهدى إليه:'));
+        var gl = h('div', 'hmg-lbl', dead ? 'المتوفى' : 'الهدية لـ');
+        gl.id = 'hmg-sexl';
+        w.appendChild(gl);
         var two = h('div', 'hmg-two');
-        var bm = btn('hmg-opt', '👨 رجل', function () { st.fem = false; st.femSet = true; upd(); });
-        var bf = btn('hmg-opt', '👩 امرأة', function () { st.fem = true; st.femSet = true; upd(); });
+        two.setAttribute('role', 'group');
+        two.setAttribute('aria-labelledby', 'hmg-sexl');
+        var bm = btn('hmg-opt', 'رجل', function () { st.fem = false; st.femSet = true; upd(); });
+        var bf = btn('hmg-opt', 'امرأة', function () { st.fem = true; st.femSet = true; upd(); });
         add(two, bm, bf);
         w.appendChild(two);
         femBtns = [bm, bf];
@@ -983,11 +1141,15 @@
         st.fem = false;
       }
 
-      w.appendChild(h('label', 'hmg-lbl', 'اسمك'));
+      var l2 = h('label', 'hmg-lbl', 'اسمك');
+      l2.htmlFor = 'hmg-from';
+      w.appendChild(l2);
       var inFrom = h('input', 'hmg-in');
+      inFrom.id = 'hmg-from';
       inFrom.type = 'text';
       inFrom.maxLength = 40;
       inFrom.autocomplete = 'off';
+      inFrom.setAttribute('enterkeyhint', 'done');
       inFrom.placeholder = 'مثال: عبدالله';
       inFrom.value = st.from;
       inFrom.disabled = st.anon;
@@ -998,17 +1160,22 @@
       cb.checked = st.anon;
       add(chk, cb, h('span', '', 'لا تُظهر اسمي (يُكتب «فاعل خير»)'));
       w.appendChild(chk);
-      w.appendChild(h('div', 'hmg-small', 'الأسماء حروف فقط، حتى 25 حرفاً.'));
 
-      var b = btn('hmg-pri', opts.withAmount ? 'التالي' : (opts.doneText || 'التالي'));
+      w.appendChild(h('div', 'hmg-pvl', 'هكذا تظهر الأسماء على البطاقة'));
+      var pv = preview(st, 'معاينة');
+      var pw = h('div', 'hmg-pv62');
+      pw.appendChild(pv);
+      w.appendChild(pw);
+
+      var b = btn('hmg-pri', opts.withAmount ? 'التالي: المبلغ' : (opts.doneText || 'التالي'));
       var sb = stickyBar(b);
-      sb.bar.appendChild(h('div', 'hmg-lock-line', '🔒 لا نطلب رقم جوالك. الأسماء تظهر على البطاقة فقط.'));
       w.appendChild(sb.bar);
 
       function upd() {
         if (femBtns) {
           femBtns[0].className = 'hmg-opt' + (st.fem ? '' : ' on');
           femBtns[1].className = 'hmg-opt' + (st.fem ? ' on' : '');
+          pressed(w);
         }
         pv.update(st);
         if (opts.withAmount) saveState(st);
@@ -1017,17 +1184,24 @@
         st.to = cleanName(inTo.value);
         if (hasFem(st.o) && !st.femSet) st.fem = FEM_RX.test(st.to);
         sb.err.textContent = '';
+        clearErr(inTo);
         upd();
       });
-      inFrom.addEventListener('input', function () { st.from = cleanName(inFrom.value); sb.err.textContent = ''; upd(); });
-      cb.addEventListener('change', function () { st.anon = cb.checked; inFrom.disabled = st.anon; sb.err.textContent = ''; upd(); });
+      inFrom.addEventListener('input', function () { st.from = cleanName(inFrom.value); sb.err.textContent = ''; clearErr(inFrom); upd(); });
+      cb.addEventListener('change', function () { st.anon = cb.checked; inFrom.disabled = st.anon; sb.err.textContent = ''; clearErr(inFrom); upd(); });
+      inTo.addEventListener('keydown', function (e) {
+        if (e.key !== 'Enter') return;
+        e.preventDefault();
+        if (!inFrom.disabled) inFrom.focus(); else b.click();
+      });
+      inFrom.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); b.click(); } });
       upd();
 
       b.addEventListener('click', function () {
         st.to = cleanName(inTo.value);
         st.from = cleanName(inFrom.value);
-        var e = checkNames(st);
-        if (e) { sb.err.textContent = e; return; }
+        var e = nameErr(st);
+        if (e) { fieldErr(e.f === 'to' ? inTo : inFrom, e.m); return; }
         st.ns = autoNs(st.to);
         if (opts.withAmount) { saveState(st); go(3); } else opts.onDone(st, sb);
       });
@@ -1035,7 +1209,7 @@
 
     function s3() {
       var w = ov.body;
-      w.appendChild(h('div', 'hmg-q', 'كم تريد أن تتبرع؟'));
+      var dead = !!OCC[st.o].dead;
       var list = amounts.list;
       if (!st.amtSet) {
         var now = readAmounts().checked;
@@ -1043,7 +1217,7 @@
         st.custom = false;
       }
       var b = btn('hmg-pri', '');
-      var amtIn = null;
+      var amtIn = null, exIn = null;
       function label() {
         b.textContent = 'تبرّع وأهدِ' + (st.amt > 0 ? ' · ' + st.amt + ' ريال' : '');
       }
@@ -1067,27 +1241,67 @@
         w.appendChild(g);
       }
       if (st.custom || !list.length) {
-        amtIn = h('input', 'hmg-in hmg-amtin');
+        var al = h('label', 'hmg-lbl', 'المبلغ بالريال');
+        al.htmlFor = 'hmg-amt';
+        amtIn = h('input', 'hmg-in hmg-amtin hmg-ltr');
+        amtIn.id = 'hmg-amt';
         amtIn.type = 'text';
+        amtIn.setAttribute('dir', 'ltr');
         amtIn.setAttribute('inputmode', 'numeric');
-        amtIn.placeholder = 'اكتب المبلغ (' + minA + ' ريال أو أكثر)';
+        amtIn.setAttribute('enterkeyhint', 'done');
+        amtIn.autocomplete = 'off';
         amtIn.value = st.amt > 0 ? String(st.amt) : '';
-        amtIn.style.marginTop = '10px';
         amtIn.addEventListener('input', function () {
           var v = parseInt(toEn(amtIn.value).replace(/[^0-9]/g, ''), 10) || 0;
           st.amt = v; st.amtSet = true;
+          clearErr(amtIn);
           label();
         });
-        w.appendChild(amtIn);
+        amtIn.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); b.click(); } });
+        add(w, al, amtIn, h('div', 'hmg-hint', minA + ' ريال أو أكثر.'));
       }
 
       var ex = EXTRA[st.p];
-      if (ex) w.appendChild(extraBox(ex));
+      if (ex) { var xb = extraBox(ex); w.appendChild(xb); exIn = xb._in; }
 
-      w.appendChild(h('label', 'hmg-lbl', 'بطاقتك'));
-      var pv = preview(st, 'شكل تقريبي، والبطاقة النهائية بعد التبرع');
-      w.appendChild(pv);
-      if (OCC[st.o].dead) {
+      // صف البطاقة المختصر
+      var crow = h('div', 'hmg-crow');
+      var ci = h('img');
+      ci.src = IMG + (dead ? 'mourn' : DS[st.d].k) + '-' + (st.th === 1 ? 'l' : 'd') + '.jpg';
+      ci.alt = '';
+      var ct = h('div', 'hmg-crt');
+      add(ct, h('b', '', 'بطاقتك'), h('span', '', (dead ? 'عن ' : 'إلى ') + st.to));
+      var cl = btn('hmg-link', showDesign ? 'إخفاء ▴' : 'غيّر الشكل', function () { showDesign = !showDesign; render(true); });
+      cl.setAttribute('aria-expanded', showDesign ? 'true' : 'false');
+      add(crow, ci, ct, cl);
+      w.appendChild(crow);
+      if (showDesign) {
+        var pv = preview(st, 'شكل تقريبي، والبطاقة النهائية بعد التبرع');
+        pv.style.marginTop = '10px';
+        w.appendChild(pv);
+        if (!dead) {
+          var row = h('div', 'hmg-designs');
+          DS.forEach(function (d, i) {
+            if (i === MOURN) return;
+            var z = btn('hmg-dz' + (st.d === i ? ' on' : ''), null, function () {
+              st.d = i; st.dSet = true; saveState(st); render(true);
+            });
+            var im = h('img');
+            im.src = IMG + d.k + '-' + (st.th === 1 ? 'l' : 'd') + '.jpg';
+            im.alt = '';
+            im.loading = 'lazy';
+            add(z, im, h('span', '', d.l));
+            row.appendChild(z);
+          });
+          w.appendChild(row);
+          var two = h('div', 'hmg-two');
+          add(two,
+            btn('hmg-opt' + (st.th === 0 ? ' on' : ''), '🌙 غامقة', function () { st.th = 0; saveState(st); render(true); }),
+            btn('hmg-opt' + (st.th === 1 ? ' on' : ''), '☀️ فاتحة', function () { st.th = 1; saveState(st); render(true); }));
+          w.appendChild(two);
+        }
+      }
+      if (dead) {
         var mrow = h('div', 'hmg-mourn');
         [0, 1].forEach(function (t) {
           var mz = btn('hmg-mz' + (st.th === t ? ' on' : ''), null, function () { st.th = t; saveState(st); render(true); });
@@ -1098,36 +1312,13 @@
           mrow.appendChild(mz);
         });
         w.appendChild(mrow);
-      } else {
-      w.appendChild(btn('hmg-link', showDesign ? 'إخفاء ▴' : '🎨 غيّر شكل البطاقة (اختياري)', function () {
-        showDesign = !showDesign; render(true);
-      }));
-      }
-      if (showDesign && !OCC[st.o].dead) {
-        var row = h('div', 'hmg-designs');
-        DS.forEach(function (d, i) {
-          if (i === MOURN) return;
-          var z = btn('hmg-dz' + (st.d === i ? ' on' : ''), null, function () {
-            st.d = i; st.dSet = true; saveState(st); render(true);
-          });
-          var im = h('img');
-          im.src = IMG + d.k + '-' + (st.th === 1 ? 'l' : 'd') + '.jpg';
-          im.alt = '';
-          im.loading = 'lazy';
-          add(z, im, h('span', '', d.l));
-          row.appendChild(z);
-        });
-        w.appendChild(row);
-        var two = h('div', 'hmg-two');
-        add(two,
-          btn('hmg-opt' + (st.th === 0 ? ' on' : ''), '🌙 غامقة', function () { st.th = 0; saveState(st); render(true); }),
-          btn('hmg-opt' + (st.th === 1 ? ' on' : ''), '☀️ فاتحة', function () { st.th = 1; saveState(st); render(true); }));
-        w.appendChild(two);
       }
       label();
       var sb = stickyBar(b);
-      sb.bar.appendChild(h('div', 'hmg-lock-line', '🔒 لا نطلب رقم جوالك. الأسماء تظهر على البطاقة فقط.'));
+      sb.bar.appendChild(h('div', 'hmg-after', 'بعد الدفع تصلك البطاقة هنا، وترسلها أنت. لا نطلب رقم جوالك.'));
       w.appendChild(sb.bar);
+      sb.amtIn = amtIn;
+      sb.exIn = exIn;
       b.addEventListener('click', function () { donate(ov, st, sb, minA); });
     }
 
@@ -1140,38 +1331,44 @@
         st.ex.sex = pv === ex.sex.m ? 'm' : (pv === ex.sex.f ? 'f' : (dead && st.femSet ? (st.fem ? 'f' : 'm') : ''));
       }
       var bx = h('div', 'hmg-box');
-      bx.appendChild(h('label', 'hmg-lbl', ex.title));
-      bx.appendChild(h('label', 'hmg-lbl', ex.name.label));
+      bx.appendChild(h('div', 'hmg-lbl', ex.title));
+      var nl = h('label', 'hmg-lbl', ex.name.label);
+      nl.htmlFor = 'hmg-exn';
+      bx.appendChild(nl);
       var inN = h('input', 'hmg-in');
+      inN.id = 'hmg-exn';
       inN.type = 'text';
       inN.maxLength = 40;
       inN.placeholder = ex.name.ph;
       inN.value = st.ex.name;
-      inN.addEventListener('input', function () { st.ex.name = inN.value.replace(/\s+/g, ' ').substr(0, 40); saveState(st); });
+      inN.addEventListener('input', function () { st.ex.name = inN.value.replace(/\s+/g, ' ').substr(0, 40); clearErr(inN); saveState(st); });
       bx.appendChild(inN);
-      bx.appendChild(h('label', 'hmg-lbl', ex.sex.label));
+      bx.appendChild(h('div', 'hmg-lbl', ex.sex.label));
       var two = h('div', 'hmg-two');
       var bm = btn('hmg-opt' + (st.ex.sex === 'm' ? ' on' : ''), ex.sex.m, function () { st.ex.sex = 'm'; sync(); });
       var bf = btn('hmg-opt' + (st.ex.sex === 'f' ? ' on' : ''), ex.sex.f, function () { st.ex.sex = 'f'; sync(); });
       function sync() {
         bm.className = 'hmg-opt' + (st.ex.sex === 'm' ? ' on' : '');
         bf.className = 'hmg-opt' + (st.ex.sex === 'f' ? ' on' : '');
+        pressed(bx);
         saveState(st);
       }
       add(two, bm, bf);
       bx.appendChild(two);
+      bx._in = inN;
       return bx;
     }
 
     render(false);
   }
 
-  function checkNames(st) {
+  function nameErr(st) {
     var dead = !!OCC[st.o].dead;
-    if (st.to.length < 2) return dead ? 'اكتب اسم المتوفى.' : 'اكتب اسم من تهديه.';
-    if (!st.anon && st.from.length < 2) return 'اكتب اسمك، أو اختر «لا تُظهر اسمي».';
-    return '';
+    if (st.to.length < 2) return {f: 'to', m: dead ? 'اكتب اسم المتوفى.' : 'اكتب اسم من تهديه.'};
+    if (!st.anon && st.from.length < 2) return {f: 'from', m: 'اكتب اسمك، أو اختر «لا تُظهر اسمي».'};
+    return null;
   }
+  function checkNames(st) { var e = nameErr(st); return e ? e.m : ''; }
 
   function pageExtra(ex) {
     var form = productForm() || document;
@@ -1194,14 +1391,14 @@
   }
 
   function donate(ov, st, sb, minA) {
-    var e = checkNames(st);
-    if (!e && !(st.amt >= minA)) e = 'اكتب مبلغاً لا يقل عن ' + minA + ' ريال.';
+    var e = checkNames(st), fld = null;
+    if (!e && !(st.amt >= minA)) { e = 'اكتب مبلغاً لا يقل عن ' + minA + ' ريال.'; fld = sb.amtIn; }
     var ex = EXTRA[st.p];
     if (!e && ex) {
-      if (st.ex.name.trim().length < 2) e = 'اكتب ' + ex.name.label + '.';
+      if (st.ex.name.trim().length < 2) { e = 'اكتب ' + ex.name.label + '.'; fld = sb.exIn; }
       else if (!st.ex.sex) e = 'اختر ' + ex.sex.label + '.';
     }
-    if (e) { sb.err.textContent = e; return; }
+    if (e) { if (fld) fieldErr(fld, e); else sb.err.textContent = e; return; }
     st.ns = autoNs(st.to);
     saveState(st);
     ev('add_to_cart');
@@ -1380,12 +1577,12 @@
 
   function confirmScreen(ov, st, c) {
     ov.clear();
-    ov.title('شكراً لتبرعك 🤍');
+    ov.title('تأكد من الأسماء');
     ov.progress(0);
     ov.back(null);
     var w = ov.body;
     var dead = !!OCC[st.o].dead;
-    w.appendChild(h('div', 'hmg-q', 'تأكد من الأسماء'));
+    w.appendChild(h('div', 'hmg-sub', 'شكراً لتبرعك. بقيت خطوة واحدة.'));
     w.appendChild(preview(st, 'معاينة'));
     var sum = h('div', 'hmg-sum');
     function row(k, v) { var d = h('div'); add(d, h('b', '', k + ' '), h('span', '', v)); sum.appendChild(d); }
@@ -1396,14 +1593,12 @@
     var b = btn('hmg-pri', 'صحيح، اصنع بطاقتي');
     var sb = stickyBar(b);
     b.addEventListener('click', function () { issue(ov, st, c, sb); });
-    sb.bar.appendChild(btn('hmg-link', 'لا، أريد التعديل', function () {
+    sb.bar.appendChild(btn('hmg-sec', 'عدّل الأسماء', function () {
       editWizard(ov, st, c, {onBack: function () { confirmScreen(ov, st, c); }});
     }));
-    var ll = h('div', 'hmg-lock-line', 'إن أغلقت الصفحة، افتح هذا الرابط من نفس الجوال: ');
-    ll.appendChild(h('span', 'hmg-ltrc', 'hamh.sa/#hadiya-complete'));
-    sb.bar.appendChild(ll);
     w.appendChild(sb.bar);
     w.appendChild(laterLink(ov));
+    ov.focusTitle();
   }
 
   function prevCards(ov, c, done) {
@@ -1438,7 +1633,7 @@
     st.ns = autoNs(st.to);
     var old = sb.btn.textContent;
     sb.btn.disabled = true;
-    sb.btn.textContent = 'نصنع بطاقتك…';
+    sb.btn.textContent = 'نصنع بطاقتك… لا تغلق الصفحة';
     sb.err.textContent = '';
     post({
       a: 'issue', order: c, p: st.p, o: st.o, d: st.d, th: st.th, ns: st.ns, fem: st.fem ? 1 : 0,
@@ -1451,7 +1646,7 @@
         if (done.c.indexOf(code) < 0) done.c.push(code);
         done.p = st.p;
         done.last = {o: st.o, d: st.d, dSet: st.dSet, th: st.th, from: st.from, anon: st.anon};
-        if (!done.x[code]) done.x[code] = {def: autoMsg(st), sms: smsText(st, code), l: 1, fem: st.fem ? 1 : 0, p: st.p};
+        if (!done.x[code]) done.x[code] = {def: autoMsg(st), sms: smsText(st, code), l: 1, fem: st.fem ? 1 : 0, p: st.p, to: st.to, fr: st.anon ? '' : st.from, dd: OCC[st.o].dead ? 1 : 0};
         if (!done.t[code]) done.t[code] = done.x[code].def;
         lsSet('hm_gift_done', done);
         lsDel('hm_gift');
@@ -1545,14 +1740,73 @@
 
     var im = h('img', 'hmg-res-img');
     im.src = src;
-    im.alt = 'بطاقة الإهداء';
+    im.alt = x.to ? 'بطاقة إهداء ' + (x.dd ? 'عن ' : 'إلى ') + x.to + ' من ' + (x.fr || 'فاعل خير') : 'بطاقة الإهداء';
     w.appendChild(im);
+
+    // صندوق الرسالة: يتغير فوراً مع كل تعديل
+    var mb = h('div', 'hmg-msg');
+    var mh = h('div', 'hmg-msgh');
+    var edOpen = false;
+    var edLink = btn('hmg-link', 'تعديل', function () {
+      edOpen = !edOpen;
+      edLink.textContent = edOpen ? 'إخفاء ▴' : 'تعديل';
+      edLink.setAttribute('aria-expanded', edOpen ? 'true' : 'false');
+      drawEd();
+    });
+    edLink.setAttribute('aria-expanded', 'false');
+    add(mh, h('span', '', 'الرسالة في واتساب مع البطاقة'), edLink);
+    var mt = h('div', 'hmg-msgt');
+    var ml = h('div', 'hmg-msgl');
+    function showMsg() {
+      mt.textContent = body();
+      ml.textContent = '';
+      ml.style.display = withLink() ? '' : 'none';
+      if (!withLink()) return;
+      ml.appendChild(document.createTextNode(x.fem ? 'بطاقتكِ: ' : 'بطاقتك: '));
+      var bd = h('bdi', '', cardUrl(code).replace(/^https?:\/\//, ''));
+      bd.setAttribute('dir', 'ltr');
+      ml.appendChild(bd);
+    }
+    add(mb, mh, mt, ml);
+    w.appendChild(mb);
+
+    var edWrap = h('div');
+    function drawEd() {
+      edWrap.textContent = '';
+      if (!edOpen) return;
+      var ta = h('textarea', 'hmg-ta');
+      ta.id = 'hmg-msgta';
+      ta.setAttribute('aria-label', 'نص الرسالة');
+      ta.maxLength = 300;
+      ta.value = body();
+      ta.style.marginTop = '10px';
+      var cnt = h('div', 'hmg-small', '');
+      cnt.style.textAlign = 'left';
+      cnt.style.direction = 'ltr';
+      function count() { cnt.textContent = ta.value.length + ' / 300'; }
+      ta.addEventListener('input', function () { done.t[code] = ta.value.substr(0, 300); save(); count(); showMsg(); });
+      count();
+      var rst = btn('hmg-link', 'إرجاع النص المقترح', function () { done.t[code] = x.def; save(); showMsg(); drawEd(); });
+      var chk = h('label', 'hmg-chk');
+      var cb = h('input');
+      cb.type = 'checkbox';
+      cb.checked = withLink();
+      add(chk, cb, h('span', '', 'أضِف رابط البطاقة في آخر الرسالة (يفتحها بضغطة)'));
+      var stl = h('div', 'hmg-small');
+      function st() {
+        stl.textContent = withLink() ? 'سيُضاف في آخر الرسالة رابط يفتح البطاقة.' : 'لن يُضاف الرابط، ويبقى الباركود داخل البطاقة لفتحها.';
+      }
+      cb.addEventListener('change', function () { x.l = cb.checked ? 1 : 0; save(); st(); showMsg(); });
+      st();
+      add(edWrap, ta, cnt, rst, chk, stl);
+    }
+    w.appendChild(edWrap);
 
     var note = h('div', 'hmg-note');
     note.style.display = 'none';
     var mob = isMobile();
 
-    var wa = btn('hmg-pri hmg-wa', 'أرسل في واتساب', function () {
+    var wa = btn('hmg-pri hmg-wa', null, function () {
       ev('sent_whatsapp');
       var file = mob ? b64File(img, name) : null;
       if (file && navigator.canShare && navigator.share && navigator.canShare({files: [file]})) {
@@ -1565,20 +1819,18 @@
       }
       window.open('https://wa.me/?text=' + encodeURIComponent(body() + '\n' + linkLine(code, x.fem)), '_blank');
     });
-    wa.style.marginTop = '14px';
+    wa.insertAdjacentHTML('afterbegin', waIcon('#fff'));
+    wa.appendChild(h('span', '', 'أرسل في واتساب'));
+    wa.style.marginTop = '12px';
     w.appendChild(wa);
+    w.appendChild(note);
 
-    var row = h('div', 'hmg-row3');
-    var cp = btn('hmg-mini', null, function () {
-      ev('copy_msg');
-      copyText(full()).then(function () {
-        cp.lastChild.textContent = 'تم النسخ ✓';
-        setTimeout(function () { cp.lastChild.textContent = 'انسخ الرسالة'; }, 2000);
-      });
-    });
-    add(cp, h('b', '', '📋'), h('span', '', 'انسخ الرسالة'));
-    var sv = btn('hmg-mini', null, function () {
+    var tip = h('div', 'hmg-small hmg-center', 'أو اضغط مطوّلاً على الصورة ثم احفظها.');
+    tip.style.display = 'none';
+    var r2 = h('div', 'hmg-r2');
+    var sv = btn('hmg-sec', 'احفظ الصورة', function () {
       ev('save_img');
+      tip.style.display = '';
       var a = document.createElement('a');
       a.href = src;
       a.download = name;
@@ -1586,69 +1838,39 @@
       a.click();
       document.body.removeChild(a);
     });
-    add(sv, h('b', '', '⬇️'), h('span', '', 'احفظ الصورة'));
-    add(row, cp, sv);
+    var cpT = h('span', '', 'انسخ الرسالة');
+    cpT.setAttribute('aria-live', 'polite');
+    var cp = btn('hmg-sec', null, function () {
+      ev('copy_msg');
+      copyText(full()).then(function () {
+        cpT.textContent = 'تم النسخ ✓';
+        setTimeout(function () { cpT.textContent = 'انسخ الرسالة'; }, 2000);
+      });
+    });
+    cp.appendChild(cpT);
+    add(r2, sv, cp);
+    w.appendChild(r2);
+    w.appendChild(tip);
     if (mob) {
-      var sm = btn('hmg-mini', null, function () {
+      w.appendChild(btn('hmg-link', 'أو ارسل برسالة نصية', function () {
         ev('sent_sms');
         location.href = 'sms:?&body=' + encodeURIComponent(x.sms);
-      });
-      add(sm, h('b', '', '✉️'), h('span', '', 'أرسل برسالة نصية'));
-      row.appendChild(sm);
+      }));
     }
-    w.appendChild(row);
-    w.appendChild(h('div', 'hmg-small hmg-center', 'أو اضغط مطوّلاً على الصورة ثم احفظها.'));
-    w.appendChild(note);
-
-    // تعديل كلام الرسالة
-    var edWrap = h('div');
-    var edOpen = false;
-    var edLink = btn('hmg-link', '✏️ غيّر كلام الرسالة', function () {
-      edOpen = !edOpen;
-      edLink.textContent = edOpen ? 'إخفاء ▴' : '✏️ غيّر كلام الرسالة';
-      drawEd();
-    });
-    function drawEd() {
-      edWrap.textContent = '';
-      if (!edOpen) return;
-      var ta = h('textarea', 'hmg-ta');
-      ta.maxLength = 300;
-      ta.value = body();
-      var cnt = h('div', 'hmg-small', '');
-      cnt.style.textAlign = 'left';
-      cnt.style.direction = 'ltr';
-      function count() { cnt.textContent = ta.value.length + ' / 300'; }
-      ta.addEventListener('input', function () { done.t[code] = ta.value.substr(0, 300); save(); count(); });
-      count();
-      var rst = btn('hmg-link', 'إرجاع النص المقترح', function () { done.t[code] = x.def; save(); drawEd(); });
-      var chk = h('label', 'hmg-chk');
-      var cb = h('input');
-      cb.type = 'checkbox';
-      cb.checked = withLink();
-      add(chk, cb, h('span', '', 'أضِف رابط البطاقة في آخر الرسالة (يفتحها بضغطة)'));
-      var stl = h('div', 'hmg-small');
-      var ll = h('div', 'hmg-small hmg-ltrc', linkLine(code, x.fem));
-      function st() {
-        stl.textContent = withLink() ? 'سيُضاف في آخر الرسالة رابط يفتح البطاقة.' : 'لن يُضاف الرابط، ويبقى الباركود داخل البطاقة لفتحها.';
-        ll.style.display = withLink() ? '' : 'none';
-      }
-      cb.addEventListener('change', function () { x.l = cb.checked ? 1 : 0; save(); st(); });
-      st();
-      add(edWrap, ta, cnt, rst, chk, stl, ll);
-    }
-    w.appendChild(edLink);
-    w.appendChild(edWrap);
 
     if (done.c.length < 2) {
+      w.appendChild(h('hr', 'hmg-hr'));
       var b3 = btn('hmg-link', 'بطاقة ثانية لشخص آخر (بلا تبرع جديد)', function () { second(ov, c, doneFor(c) || done); });
       b3.insertAdjacentHTML('afterbegin', ICON_S);
       w.appendChild(b3);
     }
     var foot = h('div', 'hmg-foot');
-    add(foot, h('span', '', 'تُرسل من واتسابك أنت، لا من رقم الجمعية. رابط البطاقة يعمل 90 يوماً، فاحفظ الصورة. · الرمز '),
+    add(foot, h('span', '', 'رابط البطاقة يعمل 90 يوماً، فاحفظ الصورة. · الرمز '),
       h('span', 'hmg-ltrc', pretty(code)));
     w.appendChild(foot);
+    showMsg();
     save();
+    ov.focusTitle();
   }
 
   /* ======================= صفحة المُهدى إليه ======================= */
@@ -1663,14 +1885,24 @@
       var w = ov.body;
       var p = r && r.p && PROJECTS.hasOwnProperty(r.p) ? r.p : '';
       if (!r || !r.ok) {
-        w.appendChild(h('div', 'hmg-q', errText(r && r.error === 'bad_code' ? 'unavailable' : (r && r.error))));
-        w.appendChild(donateLink(p));
+        w.appendChild(h('div', 'hmg-big', errText(r && r.error === 'bad_code' ? 'unavailable' : (r && r.error))));
+        var rt = btn('hmg-pri', 'أعد المحاولة', function () { ov.close(); recipient(code); });
+        rt.style.marginTop = '12px';
+        w.appendChild(rt);
+        var br = document.createElement('a');
+        br.className = 'hmg-link';
+        br.href = '/';
+        br.textContent = 'تصفّح مشاريع الجمعية';
+        br.addEventListener('click', function () { ov.close(); });
+        w.appendChild(br);
+        ov.focusTitle();
         return;
       }
       if (r.expired) {
         w.appendChild(h('div', 'hmg-q', 'انتهت مدة عرض هذه البطاقة. جزى الله من أهداها خيراً.'));
         w.appendChild(donateLink(p));
         footer(w, code);
+        ov.focusTitle();
         return;
       }
       if (!r.dead) ov.title('وصلتك هدية خير');
@@ -1678,37 +1910,49 @@
       im.src = 'data:image/png;base64,' + r.img;
       im.alt = 'بطاقة الإهداء';
       w.appendChild(im);
-      var from = r.from || '';
-      var line = h('div', 'hmg-q', from ? INVITE + ' كما شارك ' + from + '.' : INVITE + '.');
-      line.style.fontSize = '17px';
-      line.style.marginTop = '14px';
-      w.appendChild(line);
+      var from = String(r.from || '').trim();
+      if (from === 'فاعل خير') from = '';
+      if (!r.dead && p) {
+        w.appendChild(h('div', 'hmg-big', (from ? 'أهدى لك ' + from + ' ' : 'وصلك ') + 'أجر مشروع «' + PROJECTS[p] + '» ' + FIELD + '.'));
+      }
+      var gl = h('div', 'hmg-gl', from ? INVITE + ' كما شارك ' + from + '.' : INVITE + '.');
+      if (r.dead || !p) gl.style.marginTop = '14px';
+      w.appendChild(gl);
       w.appendChild(donateLink(p));
       if (!r.dead && from && p) {
         var th = document.createElement('a');
-        th.className = 'hmg-sec';
+        th.className = 'hmg-sec hmg-thx';
         th.href = 'https://wa.me/?text=' + encodeURIComponent('جزاك الله خيراً يا ' + from + ' على إهدائي أجر «' + PROJECTS[p] + '» ' + FIELD + ' 💚');
         th.target = '_blank';
         th.rel = 'noopener';
-        th.textContent = '💚 اشكر ' + from + ' في واتساب';
+        th.insertAdjacentHTML('afterbegin', waIcon('#25D366'));
+        th.appendChild(h('span', '', 'اشكر ' + from + ' في واتساب'));
         th.addEventListener('click', function () { ev('thank_click'); });
         w.appendChild(th);
       }
+      var lk = h('div', 'hmg-links');
+      var sv = document.createElement('a');
+      sv.className = 'hmg-link';
+      sv.href = 'data:image/png;base64,' + r.img;
+      sv.download = 'hadiya-' + pretty(code) + '.png';
+      sv.textContent = 'احفظ البطاقة';
       var g = document.createElement('a');
       g.className = 'hmg-link';
       g.href = p ? '/products/' + encodeURIComponent(p) + '#hadiya-open' : '/';
-      g.textContent = 'أهدِ أنت أيضاً لمن تحب';
+      g.textContent = 'أهدِ من تحب';
       g.insertAdjacentHTML('afterbegin', ICON_S);
       g.addEventListener('click', function () { ev('recipient_gift'); ov.close(); });
-      w.appendChild(g);
+      add(lk, sv, g);
+      w.appendChild(lk);
       footer(w, code);
+      ov.focusTitle();
     });
   }
   function donateLink(p) {
     var a = document.createElement('a');
     a.className = 'hmg-pri';
     a.href = p ? '/products/' + encodeURIComponent(p) : '/';
-    a.textContent = p ? 'تبرّع أنت أيضاً في «' + PROJECTS[p] + '»' : 'تبرّع أنت أيضاً';
+    a.textContent = 'تبرّع أنت أيضاً';
     a.style.marginTop = '12px';
     a.addEventListener('click', function () { ev('recipient_donate'); if (openOv) openOv.close(); });
     return a;
