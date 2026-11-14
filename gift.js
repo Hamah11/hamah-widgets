@@ -465,7 +465,7 @@
       '.hmg-ov .hmg-tile.on::after,.hmg-ov .hmg-opt.on::after,.hmg-ov .hmg-mz.on::after,.hmg-ov .hmg-dz.on::after{content:"✓";position:absolute;top:-7px;left:-7px;width:20px;height:20px;border-radius:50%;background:' + C1 + ';color:#fff;font-size:13px;font-weight:800;line-height:1;display:flex;align-items:center;justify-content:center;z-index:1;box-shadow:0 0 0 2px #fff}',
       '.hmg-ov .hmg-pri{height:auto;min-height:54px;line-height:1.4;padding:6px 12px}',
       '.hmg-ov .hmg-sec{height:auto;min-height:50px;gap:8px}',
-      '.hmg-ov .hmg-bar{margin-top:16px}',
+      '.hmg-ov .hmg-bar{margin-top:16px;z-index:2}',
       '.hmg-ov .hmg-amtv{font-size:12.5px;color:#5b6b80}',
       '.hmg-ov .hmg-foot{font-size:12.5px;color:#5b6b80;line-height:1.7}',
       '.hmg-ov .hmg-rib{font-size:max(2.6cqw,11px)}',
@@ -668,8 +668,9 @@
       add(w, lt,
         h('div', 'hmg-small', 'هل تريد الإغلاق الآن؟'));
       var row = h('div', 'hmg-confirm');
-      add(row, btn('hmg-sec', 'نعم، أغلق', function () { ov.close(); }), btn('hmg-sec', 'لا', function () { w.textContent = ''; w.appendChild(a); }));
+      add(row, btn('hmg-sec', 'نعم، أغلق', function () { ov.close(); }), btn('hmg-sec', 'لا', function () { w.textContent = ''; w.appendChild(a); a.focus(); }));
       w.appendChild(row);
+      row.firstChild.focus();
     });
     w.appendChild(a);
     return w;
@@ -1786,7 +1787,7 @@
       function count() { cnt.textContent = ta.value.length + ' / 300'; }
       ta.addEventListener('input', function () { done.t[code] = ta.value.substr(0, 300); save(); count(); showMsg(); });
       count();
-      var rst = btn('hmg-link', 'إرجاع النص المقترح', function () { done.t[code] = x.def; save(); showMsg(); drawEd(); });
+      var rst = btn('hmg-link', 'إرجاع النص المقترح', function () { done.t[code] = x.def; save(); showMsg(); drawEd(); var n = edWrap.querySelector('.hmg-link'); if (n) n.focus(); });
       var chk = h('label', 'hmg-chk');
       var cb = h('input');
       cb.type = 'checkbox';
