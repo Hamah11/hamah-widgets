@@ -1818,7 +1818,7 @@
         note.style.display = '';
         return;
       }
-      window.open('https://wa.me/?text=' + encodeURIComponent(body() + '\n' + linkLine(code, x.fem)), '_blank');
+      window.open('https://wa.me/?text=' + encodeURIComponent(full()), '_blank');
     });
     wa.insertAdjacentHTML('afterbegin', waIcon('#fff'));
     wa.appendChild(h('span', '', 'أرسل في واتساب'));
