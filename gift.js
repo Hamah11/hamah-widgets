@@ -2001,15 +2001,21 @@
     return m ? m[0] : '';
   }
   function minMsg(q, text) {
-    var box = q.parentNode && q.parentNode.parentNode;
-    if (!box) return;
-    var old = box.querySelector('.hm-minerr');
-    if (!text) { if (old) old.parentNode.removeChild(old); q.style.removeProperty('border-color'); return; }
+    var old = q._hmErr;
+    if (!text) {
+      if (old && old.parentNode) old.parentNode.removeChild(old);
+      q._hmErr = null;
+      q.style.removeProperty('border-color');
+      return;
+    }
     if (!old) {
+      var anchor = (q.closest && q.closest('.btn-atc')) || (q.parentNode && q.parentNode.parentNode);
+      if (!anchor || !anchor.parentNode) return;
       old = h('div', 'hm-minerr');
       old.setAttribute('role', 'alert');
-      old.style.cssText = 'order:99;flex:0 0 100%;width:100%;margin:8px 4px 0;color:#c62828;font-size:14px;font-weight:600;line-height:1.6;text-align:right;direction:rtl';
-      box.appendChild(old);
+      old.style.cssText = 'display:block;width:100%;clear:both;margin:8px 4px 0;color:#c62828;font-size:14px;font-weight:600;line-height:1.6;text-align:right;direction:rtl';
+      anchor.parentNode.insertBefore(old, anchor.nextSibling);
+      q._hmErr = old;
     }
     old.textContent = text;
     q.style.setProperty('border-color', '#c62828', 'important');
