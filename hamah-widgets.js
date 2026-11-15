@@ -376,7 +376,7 @@
       while((m=re.exec(html))){ if(m[1].indexOf(MARK)>-1){ save(m[1]); if(!hasCurrent()) apply(m[1]); return; } }
     }).catch(function(){});
   }
-  function run(){ if(hasCurrent()) return; var c=read(); if(c && c.css) apply(c.css); if(!c || !c.css || (Date.now()-c.t)>TTL) refresh(); }
+  function run(){ if(/^\/(checkout|payment)(\/|$)/.test(location.pathname)) return; if(hasCurrent()) return; var c=read(); if(c && c.css) apply(c.css); if(!c || !c.css || (Date.now()-c.t)>TTL) refresh(); }
   if(document.head && document.querySelector('style')) run(); else document.addEventListener('DOMContentLoaded', run);
 })();
 
