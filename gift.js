@@ -1967,6 +1967,108 @@
     w.appendChild(f);
   }
 
+  /* ======================= حد المبلغ في زر «تبرع الآن» العادي ======================= */
+
+  var minById = {};
+  function minFor(id, cb) {
+    if (!id) { cb(MIN_FLOOR); return; }
+    if (minById[id]) { cb(minById[id]); return; }
+    fetch('/api/v1/products/' + encodeURIComponent(id), {headers: {Accept: 'application/json'}}).then(function (r) { return r.json(); })
+      .then(function (j) {
+        var p = (j && j.data && j.data.product) || {};
+        var pr = p.purchase_restrictions || {};
+        var m = parseInt(pr.min_quantity_per_cart || p.min_quantity_per_cart, 10);
+        minById[id] = m > MIN_FLOOR ? m : MIN_FLOOR;
+        cb(minById[id]);
+      }, function () { cb(MIN_FLOOR); });
+  }
+
+  function minText(m) { return 'التبرع يبدأ من ' + m + ' ريال أو أكثر'; }
+
+  /* خانة المبلغ وزر التبرع في أقرب صندوق يجمعهما (صفحة المشروع أو بطاقة في الرئيسية) */
+  function donateScope(el) {
+    var n = el, i = 0;
+    while (n && n !== document.body && i < 12) {
+      var q = n.querySelector && n.querySelector('input[name="quantity"].qty');
+      var b = n.querySelector && n.querySelector('a.single_add_to_cart_button[onclick]');
+      if (q && b) return {q: q, b: b};
+      n = n.parentNode; i++;
+    }
+    return null;
+  }
+  function scopeId(sc) {
+    var m = (sc.b.getAttribute('onclick') || '').match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/);
+    return m ? m[0] : '';
+  }
+  function minMsg(q, text) {
+    var box = q.parentNode && q.parentNode.parentNode;
+    if (!box) return;
+    var old = box.querySelector('.hm-minerr');
+    if (!text) { if (old) old.parentNode.removeChild(old); q.style.removeProperty('border-color'); return; }
+    if (!old) {
+      old = h('div', 'hm-minerr');
+      old.setAttribute('role', 'alert');
+      old.style.cssText = 'order:99;flex:0 0 100%;width:100%;margin:8px 4px 0;color:#c62828;font-size:14px;font-weight:600;line-height:1.6;text-align:right;direction:rtl';
+      box.appendChild(old);
+    }
+    old.textContent = text;
+    q.style.setProperty('border-color', '#c62828', 'important');
+  }
+
+  function normalMin() {
+    document.addEventListener('focusin', function (e) {
+      var t = e.target;
+      if (!t || !t.matches || !t.matches('input[name="quantity"].qty')) return;
+      var sc = donateScope(t);
+      if (sc) minFor(scopeId(sc), function () { /* تجهيز الحد قبل الضغط */ });
+    });
+    document.addEventListener('input', function (e) {
+      var t = e.target;
+      if (t && t.matches && t.matches('input[name="quantity"].qty')) minMsg(t, '');
+    });
+    document.addEventListener('click', function (e) {
+      var t = e.target;
+      var b = t && t.closest && t.closest('a.single_add_to_cart_button[onclick]');
+      if (!b) return;
+      var sc = donateScope(b);
+      if (!sc) return;
+      var raw = toEn(sc.q.value || '').replace(/[^0-9]/g, '');
+      if (!raw) return;
+      var v = parseInt(raw, 10) || 0;
+      var m = minById[scopeId(sc)] || MIN_FLOOR;
+      if (v >= m) { minMsg(sc.q, ''); return; }
+      e.preventDefault();
+      e.stopPropagation();
+      if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+      minMsg(sc.q, minText(m));
+      try { sc.q.focus({preventScroll: true}); } catch (x) { /* لا شيء */ }
+    }, true);
+  }
+
+  /* إشعار زد «الحد الأدنى لكمية المنتج…» يُعاد بصياغة التبرع */
+  function toastWording() {
+    var tries = 0;
+    var t = setInterval(function () {
+      tries++;
+      var jq = window.jQuery;
+      if (jq && typeof jq.toast === 'function' && !jq.toast._hm) {
+        var orig = jq.toast;
+        var w = function (o) {
+          try {
+            if (o && typeof o.text === 'string') {
+              o.text = o.text.replace(/الحد الأدنى لكمية المنتج في الطلب الواحد\s*([0-9٠-٩]+)/, 'الحد الأدنى لهذا المشروع $1 ريال');
+            }
+          } catch (x) { /* النص كما هو */ }
+          return orig.apply(this, arguments);
+        };
+        for (var k in orig) if (Object.prototype.hasOwnProperty.call(orig, k)) w[k] = orig[k];
+        w._hm = 1;
+        jq.toast = w;
+      }
+      if ((jq && jq.toast && jq.toast._hm) || tries > 40) clearInterval(t);
+    }, 250);
+  }
+
   /* ======================= التوجيه ======================= */
 
   function clearHash() {
@@ -1992,6 +2094,7 @@
       var tm = path.match(THANK_PATH_RX);
       var handled = onHash();
       if (tm) { if (!handled) thankPage(tm[1]); return; }
+      if (!/^\/(checkout|payment|auth)(\/|$)/.test(path)) { normalMin(); toastWording(); }
       if (pageSlug()) watch(productButton);
       watch(cardLinks);
       window.addEventListener('hashchange', onHash);
