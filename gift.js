@@ -441,6 +441,7 @@
       '.hmg-ov .hmg-body{padding-top:8px;scroll-padding-bottom:96px}',
       '.hmg-ov .hmg-sub{font-size:14px;color:#5b6b80;text-align:center;margin:0 0 12px;line-height:1.6}',
       '.hmg-ov .hmg-hint,.hmg-ov .hmg-pvl,.hmg-ov .hmg-after{font-size:12.5px;color:#5b6b80;line-height:1.6;margin:5px 0 0}',
+      '.hmg-ov .hmg-ferr+.hmg-minh{display:none}',
       '.hmg-ov .hmg-pvl{text-align:center;margin:10px 0 6px}',
       '.hmg-ov .hmg-after{text-align:center;margin-top:8px}',
       '.hmg-ov .hmg-pv62{width:62%;margin:0 auto}',
@@ -885,6 +886,8 @@
     return {list: list, checked: checked};
   }
 
+  /* أقل مبلغ يقبله الدفع في زد. حد المشروع من زد يُؤخذ إن كان أكبر. */
+  var MIN_FLOOR = 3;
   var minCache = null;
   function minAmount() {
     if (minCache) return minCache;
@@ -892,14 +895,14 @@
     var idEl = form && form.querySelector('#product-id');
     var id = (idEl && idEl.value) || (form ? form.id.replace(/^product-form-/, '') : '');
     minCache = new Promise(function (res) {
-      if (!id) return res(1);
+      if (!id) return res(MIN_FLOOR);
       fetch('/api/v1/products/' + encodeURIComponent(id), {headers: {Accept: 'application/json'}}).then(function (r) { return r.json(); })
         .then(function (j) {
           var p = (j && j.data && j.data.product) || {};
           var pr = p.purchase_restrictions || {};
           var m = parseInt(pr.min_quantity_per_cart || p.min_quantity_per_cart, 10);
-          res(m > 0 ? m : 1);
-        }, function () { res(1); });
+          res(m > MIN_FLOOR ? m : MIN_FLOOR);
+        }, function () { res(MIN_FLOOR); });
     });
     return minCache;
   }
@@ -1017,7 +1020,7 @@
     var showDesign = false;
     var total = opts.withAmount ? 3 : 2;
     var amounts = opts.withAmount ? readAmounts() : null;
-    var minA = 1;
+    var minA = MIN_FLOOR;
     if (opts.withAmount) minAmount().then(function (m) { minA = m; });
 
     function go(n) { step = n; render(false); }
@@ -1259,7 +1262,7 @@
           label();
         });
         amtIn.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); b.click(); } });
-        add(w, al, amtIn, h('div', 'hmg-hint', minA + ' ريال أو أكثر.'));
+        add(w, al, amtIn, h('div', 'hmg-hint hmg-minh', 'التبرع يبدأ من ' + minA + ' ريال أو أكثر'));
       }
 
       var ex = EXTRA[st.p];
@@ -1393,7 +1396,7 @@
 
   function donate(ov, st, sb, minA) {
     var e = checkNames(st), fld = null;
-    if (!e && !(st.amt >= minA)) { e = 'اكتب مبلغاً لا يقل عن ' + minA + ' ريال.'; fld = sb.amtIn; }
+    if (!e && !(st.amt >= minA)) { e = 'التبرع يبدأ من ' + minA + ' ريال أو أكثر'; fld = sb.amtIn; }
     var ex = EXTRA[st.p];
     if (!e && ex) {
       if (st.ex.name.trim().length < 2) { e = 'اكتب ' + ex.name.label + '.'; fld = sb.exIn; }
