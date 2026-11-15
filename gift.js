@@ -2000,7 +2000,7 @@
     var m = (sc.b.getAttribute('onclick') || '').match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/);
     return m ? m[0] : '';
   }
-  function minMsg(q, text) {
+  function minMsg(q, text, at) {
     var old = q._hmErr;
     if (!text) {
       if (old && old.parentNode) old.parentNode.removeChild(old);
@@ -2009,7 +2009,7 @@
       return;
     }
     if (!old) {
-      var anchor = (q.closest && q.closest('.btn-atc')) || (q.parentNode && q.parentNode.parentNode);
+      var anchor = at || (q.closest && q.closest('.btn-atc')) || (q.parentNode && q.parentNode.parentNode);
       if (!anchor || !anchor.parentNode) return;
       old = h('div', 'hm-minerr');
       old.setAttribute('role', 'alert');
@@ -2030,10 +2030,23 @@
     });
     document.addEventListener('input', function (e) {
       var t = e.target;
-      if (t && t.matches && t.matches('input[name="quantity"].qty')) minMsg(t, '');
+      if (t && t.matches && t.matches('input[name="quantity"].qty,#quickDonationInput')) minMsg(t, '');
     });
     document.addEventListener('click', function (e) {
       var t = e.target;
+      var qb = t && t.closest && t.closest('#quickDonationSubmit');
+      if (qb) {
+        /* نافذة «التبرع السريع»: أرضية 3 ريال */
+        var qi = document.getElementById('quickDonationInput');
+        if (!qi) return;
+        var qv = parseInt(toEn(qi.value || '').replace(/[^0-9]/g, ''), 10) || 0;
+        if (qv >= MIN_FLOOR) { minMsg(qi, ''); return; }
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+        minMsg(qi, minText(MIN_FLOOR), qi);
+        return;
+      }
       var b = t && t.closest && t.closest('a.single_add_to_cart_button[onclick]');
       if (!b) return;
       var sc = donateScope(b);
