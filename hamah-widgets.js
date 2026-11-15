@@ -380,13 +380,34 @@
   if(document.head && document.querySelector('style')) run(); else document.addEventListener('DOMContentLoaded', run);
 })();
 
-/* HM-RESERVED-BAR: زر شريط «لديك عملية شراء قائمة» يظهر في الثيم أخضر على أخضر. نجعل خطه أبيض ونصه «متابعة التبرع». */
+/* HM-RESERVED-BAR v2: شريط الثيم بعد دفع لم يكتمل. زر الثيم أخضر على أخضر، ولا يفك الحجز للعميل المسجّل. */
 (function(){
+  var MSG='تبرعك السابق لم يكتمل.', T_GUEST='متابعة التبرع', T_USER='تبرّع الآن كزائر';
+  function setText(bar){
+    var n=bar.childNodes;
+    for(var i=0;i<n.length;i++){ if(n[i].nodeType===3 && /عملية شراء قائمة/.test(n[i].nodeValue)) n[i].nodeValue=' '+MSG+' '; }
+  }
   function fix(){
-    var b=document.querySelector('.server-error form[action="/cart/clone"] button');
-    if(!b) return;
+    var bar=document.querySelector('.server-error'); if(!bar) return;
+    var form=bar.querySelector('form[action="/cart/clone"]'); if(!form) return;
+    var b=form.querySelector('button'); if(!b) return;
     b.style.setProperty('color','#fff','important');
-    b.textContent='متابعة التبرع';
+    b.textContent=T_GUEST;
+    setText(bar);
+    fetch('/account-orders?hm='+Date.now(),{credentials:'same-origin',cache:'no-store'}).then(function(r){ return r.text(); }).then(function(t){
+      if(/Redirecting to/.test(t.slice(0,3000))) return; /* زائر: زر الثيم يفك الحجز */
+      b.textContent=T_USER;
+      form.addEventListener('submit',function(e){
+        e.preventDefault();
+        if(b.disabled) return;
+        b.disabled=true; b.textContent='لحظة…';
+        var tok=(form.querySelector('input[name="_token"]')||{}).value||'';
+        var fd=new URLSearchParams(); fd.append('_token',tok);
+        fetch('/auth/logout',{method:'POST',body:fd,credentials:'same-origin',headers:{'Content-Type':'application/x-www-form-urlencoded'}})
+          .then(function(){ if(/^\/(cart|checkout)/.test(location.pathname)) location.href='/'; else location.reload(); },
+                function(){ b.disabled=false; b.textContent=T_USER; });
+      });
+    }).catch(function(){});
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',fix);else fix();
 })();
