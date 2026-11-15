@@ -380,6 +380,17 @@
   if(document.head && document.querySelector('style')) run(); else document.addEventListener('DOMContentLoaded', run);
 })();
 
+/* HM-RESERVED-BAR: زر شريط «لديك عملية شراء قائمة» يظهر في الثيم أخضر على أخضر. نجعل خطه أبيض ونصه «متابعة التبرع». */
+(function(){
+  function fix(){
+    var b=document.querySelector('.server-error form[action="/cart/clone"] button');
+    if(!b) return;
+    b.style.setProperty('color','#fff','important');
+    b.textContent='متابعة التبرع';
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',fix);else fix();
+})();
+
 /* أهدِ من تحب — يحمّل gift.js من نفس الـcommit */
 (function () {
   try {
