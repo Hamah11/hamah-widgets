@@ -486,3 +486,57 @@
     setTimeout(function(){ try{ mo.disconnect(); }catch(e){} }, 30000);
   }
 })();
+
+/* HM-WORDING 2026-11-15: نصوص «التبرع» بدل «الشراء» في صفحتي الدخول والسلة، وتصحيح إملائي.
+   يعمل في /auth و/cart فقط (لا /checkout ولا /payment). يبدّل نص العقد فقط، بمطابقة حرفية بعد توحيد المسافات.
+   يراقب الصفحة 60 ثانية ثم يتوقف، ويوقف مراقبه أثناء التبديل. أي خطأ لا يوقف باقي الملف. */
+(function(){
+  try{
+    var p = location.pathname;
+    var inAuth = /^\/auth(\/|$)/.test(p), inCart = /^\/cart(\/|$)/.test(p);
+    if (!inAuth && !inCart) return;
+    var AUTH = {
+      'الشراء كزائر': 'التبرع كزائر',
+      'ادخل معلوماتك للشراء كزائر': 'أدخل معلوماتك للتبرع كزائر',
+      'الاسم كامل': 'الاسم الكامل'
+    };
+    var CART = {
+      'الكمية': 'المبلغ',
+      'اجمالي التبرعات': 'إجمالي التبرعات',
+      'السلة فارغه!': 'السلة فارغة!'
+    };
+    var MAP = inAuth ? AUTH : CART;
+    var SKIP = /^(SCRIPT|STYLE|NOSCRIPT|OPTION|TEXTAREA)$/;
+    var mo = null, timer = null;
+    function norm(t){ return String(t || '').replace(/\s+/g, ' ').replace(/^ | $/g, ''); }
+    function swap(node, txt){ node.nodeValue = node.nodeValue.replace(/\S[\s\S]*\S|\S/, txt); }
+    function work(){
+      if (!document.body) return;
+      var w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT), n, list = [];
+      while ((n = w.nextNode())) { if (n.parentNode && !SKIP.test(n.parentNode.nodeName)) list.push(n); }
+      for (var i = 0; i < list.length; i++){
+        var nd = list[i], t = norm(nd.nodeValue);
+        if (!t) continue;
+        if (MAP.hasOwnProperty(t)) { swap(nd, MAP[t]); continue; }
+        if (inAuth && t.indexOf('ادناه ،') > -1 && t.indexOf('ارسال') > -1) {
+          nd.nodeValue = nd.nodeValue.replace('ادناه ،', 'أدناه،').replace('ارسال', 'إرسال');
+        }
+      }
+      if (inCart && document.title.indexOf('سلة المشتريات') > -1) document.title = document.title.replace('سلة المشتريات', 'سلة التبرعات');
+    }
+    function watch(){ if (mo && document.body) mo.observe(document.body, {childList:true, subtree:true, characterData:true}); }
+    function run(){
+      try{ if (mo) mo.disconnect(); work(); }catch(e){}
+      watch();
+    }
+    function start(){
+      run();
+      if (window.MutationObserver){
+        mo = new MutationObserver(function(){ clearTimeout(timer); timer = setTimeout(run, 100); });
+        watch();
+        setTimeout(function(){ try{ mo.disconnect(); mo = null; }catch(e){} }, 60000);
+      }
+    }
+    if (document.body) start(); else document.addEventListener('DOMContentLoaded', start);
+  }catch(err){}
+})();
