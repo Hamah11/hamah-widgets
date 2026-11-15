@@ -5,6 +5,8 @@
    <script src="https://cdn.jsdelivr.net/gh/Hamah11/hamah-widgets@main/hamah-widgets.js" defer></script>
    بعد أي تعديل في GitHub: افتح https://purge.jsdelivr.net/gh/Hamah11/hamah-widgets@main/hamah-widgets.js مرة واحدة لتحديث النسخة.
    ============================================================ */
+/* HM-BLOGS-REDIRECT 2026-11-16: صفحة /blogs (قائمة المقالات) فارغة، فتُحوَّل إلى الرئيسية. صفحات /blogs/<اسم> لا تتأثر. */
+(function(){try{if(/^\/(ar\/)?blogs\/?$/.test(location.pathname))location.replace('/');}catch(e){}})();
 (function () {
   'use strict';
 
