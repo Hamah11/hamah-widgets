@@ -382,7 +382,7 @@
 
 /* HM-RESERVED-BAR v2: شريط الثيم بعد دفع لم يكتمل. زر الثيم أخضر على أخضر، ولا يفك الحجز للعميل المسجّل. */
 (function(){
-  var MSG='تبرعك السابق لم يتم.', T_GUEST='أكمل تبرعك', T_USER='ادخل كزائر وأكمل تبرعك';
+  var MSG='تبرعك السابق لم يتم.', T_GUEST='أكمل تبرعك', T_USER='ادخل كزائر وتبرّع';
   function setText(bar){
     var n=bar.childNodes;
     for(var i=0;i<n.length;i++){ if(n[i].nodeType===3 && /عملية شراء قائمة/.test(n[i].nodeValue)) n[i].nodeValue=' '+MSG+' '; }
