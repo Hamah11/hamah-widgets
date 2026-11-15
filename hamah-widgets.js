@@ -387,6 +387,19 @@
     var n=bar.childNodes;
     for(var i=0;i<n.length;i++){ if(n[i].nodeType===3 && /عملية شراء قائمة/.test(n[i].nodeValue)) n[i].nodeValue=' '+MSG+' '; }
   }
+  function look(bar){
+    bar.classList.add('hm-rbar');
+    if(!document.getElementById('hm-rbar-css')){
+      var st=document.createElement('style'); st.id='hm-rbar-css';
+      st.textContent='.server-error.hm-rbar{background:#FDECEA!important;color:#7A1F1A!important;text-align:center!important;font-size:18px!important;font-weight:700!important;padding:14px 48px!important;position:relative!important;line-height:1.8!important;border-bottom:1px solid #f3c9c4!important}'
+        +'.server-error.hm-rbar .closebtn{position:absolute!important;left:14px!important;right:auto!important;top:50%!important;transform:translateY(-50%)!important;float:none!important;margin:0!important;font-size:26px!important;line-height:1!important;color:#B3413A!important;cursor:pointer!important}'
+        +'.server-error.hm-rbar form button{color:#fff!important;font-size:17px!important;font-weight:700!important;padding:8px 22px!important;margin:4px 10px!important;border-radius:8px!important}'
+        +'@media(max-width:600px){.server-error.hm-rbar{font-size:15px!important;padding:10px 40px!important}.server-error.hm-rbar form button{font-size:15px!important;padding:7px 16px!important}}';
+      document.head.appendChild(st);
+    }
+    var x=bar.querySelector('.closebtn');
+    if(x) x.addEventListener('click',function(){ bar.style.setProperty('display','none','important'); });
+  }
   function fix(){
     var bar=document.querySelector('.server-error'); if(!bar) return;
     var form=bar.querySelector('form[action="/cart/clone"]'); if(!form) return;
@@ -394,6 +407,7 @@
     b.style.setProperty('color','#fff','important');
     b.textContent=T_GUEST;
     setText(bar);
+    look(bar);
     fetch('/account-orders?hm='+Date.now(),{credentials:'same-origin',cache:'no-store'}).then(function(r){ return r.text(); }).then(function(t){
       if(/Redirecting to/.test(t.slice(0,3000))) return; /* زائر: زر الثيم يفك الحجز */
       b.textContent=T_USER;
