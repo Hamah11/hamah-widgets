@@ -710,3 +710,23 @@
     setTimeout(hide, 1500); setTimeout(hide, 4000); setTimeout(hide, 8000);
   } catch (e) {}
 })();
+
+/* ============================================================
+   HM-HIDE-FAB — يخفي زر التبرع السريع الجانبي (#quickDonationFab) في صفحات:
+   الشكر والفاتورة والإيصال (/order-completed، /orders، /o)، «طلباتي» (/account-orders)، السلة (/cart)، والإهداء (#hadiya…)، وأثناء فتح نافذة الإهداء أو الإيصال.
+   طلب عبدالله 2026-11-25 (كان يغطي زر «الإيصال» على الجوال). للإلغاء: احذف هذا الجزء.
+   ============================================================ */
+(function(){
+  try {
+    var s = document.createElement('style');
+    s.textContent = 'html.hm-nofab #quickDonationFab,body:has(.hmg-ov) #quickDonationFab,body:has(.hmr-ov) #quickDonationFab{display:none!important}';
+    (document.head || document.documentElement).appendChild(s);
+    var set = function () {
+      var p = location.pathname, h = location.hash || '';
+      var off = /^\/(order-completed|orders|o)\//.test(p) || p === '/account-orders' || /^\/cart(\/|$)/.test(p) || h.indexOf('#hadiya') === 0;
+      document.documentElement.classList.toggle('hm-nofab', off);
+    };
+    set();
+    window.addEventListener('hashchange', set);
+  } catch (e) {}
+})();
