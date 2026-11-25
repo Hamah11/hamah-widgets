@@ -660,3 +660,53 @@
   window.addEventListener('load', check);
   setTimeout(check, 2000);
 })();
+
+/* ============================================================
+   HM-RECEIPT-LOADER — يحمّل receipt.js («تحميل الإيصال» + صفحة التحقق + «طلباتي وإيصالاتي») من نفس رقم الـcommit
+   يعمل فقط في صفحات الفاتورة والشكر وطلباتي، أو مع #receipt=
+   الإيقاف السريع: RECEIPT_ON=0 في شيت «إيصالات هامة»، أو احذف هذا الجزء.
+   ============================================================ */
+(function(){
+  try {
+    if (document.getElementById('hm-receipt-js')) return;
+    var p = location.pathname, h = location.hash || '';
+    if (h === '#iysali') { location.replace('/account-orders'); return; }   /* «إيصالي»: صفحة طلباتي في زد */
+    if (!/^\/(o\/[A-Za-z0-9]{6,24}\/inv|(order-completed|orders)\/[A-Za-z0-9]{6,24}\/invoice)/.test(p) && h.indexOf('#receipt=') !== 0 && !/^\/(order-completed|orders)\//.test(p) && h !== '#hadiya-complete' && p !== '/account-orders') return;
+    var me = document.currentScript && document.currentScript.src;
+    if (!me) { var s = document.querySelector('script[src*="hamah-widgets.js"]'); me = s && s.src; }
+    if (!me || me.indexOf('hamah-widgets.js') < 0) return;
+    var r = document.createElement('script');
+    r.id = 'hm-receipt-js'; r.defer = true; r.charset = 'utf-8';
+    r.src = me.replace(/hamah-widgets\.js(\?.*)?$/, 'receipt.js');
+    (document.head || document.documentElement).appendChild(r);
+  } catch (e) {}
+})();
+
+/* ============================================================
+   HM-HIDE-ZID — يخفي «صنع بواسطة زد» وشريطه الرمادي في صفحات الدخول والدفع والشكر والفاتورة (مسموح للجمعية 2026-11-25)
+   ويخفي نافذة «اختم شرائك بتبرع» (مزيد بلس) في صفحتي الشكر والفاتورة حتى يوقفها دعم زد.
+   للإلغاء: احذف هذا الجزء.
+   ============================================================ */
+(function(){
+  try {
+    var css = 'a.footer-marketing-link{display:none!important}';
+    if (/^\/(order-completed|orders|o)\//.test(location.pathname)) css += '#mazeedplus-bottom-sheet-container{display:none!important}';
+    var s = document.createElement('style');
+    s.textContent = css;
+    (document.head || document.documentElement).appendChild(s);
+    var extra = function (p, a) {   /* هل في الأب صورة أو حقل أو زر خارج رابط زد؟ */
+      var x = p.querySelectorAll('img,svg,input,button,select,iframe');
+      for (var i = 0; i < x.length; i++) if (!a.contains(x[i])) return true;
+      return false;
+    };
+    var hide = function () {
+      document.querySelectorAll('a.footer-marketing-link').forEach(function (a) {
+        var e = a, t = (a.textContent || '').trim(), n = 0;   /* حتى 6 مستويات */
+        while (t && n < 6 && e.parentElement && e.parentElement !== document.body && (e.parentElement.textContent || '').trim() === t && !extra(e.parentElement, a)) { e = e.parentElement; n++; }
+        e.style.setProperty('display', 'none', 'important');
+      });
+    };
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', hide); else hide();
+    setTimeout(hide, 1500); setTimeout(hide, 4000); setTimeout(hide, 8000);
+  } catch (e) {}
+})();

@@ -429,6 +429,7 @@
         ';box-shadow:0 8px 28px rgba(0,0,0,.18)' + I + ';direction:rtl' + I + ';font-family:' + FONT + I + ';max-width:520px;margin:0 auto' + I + '}',
       '.hmg-tbar a{flex:1;display:flex;align-items:center;gap:6px;color:' + C1 + I + ';font-weight:800;font-size:15px;text-decoration:none' + I + ';padding:8px 6px}',
       '.hmg-tbar button{width:34px' + I + ';height:34px' + I + ';border:0' + I + ';background:#F2F5F4' + I + ';border-radius:10px' + I + ';color:#33403D' + I + ';font-size:18px' + I + ';padding:0' + I + ';cursor:pointer}',
+      '.hmg-ov .hmg-x{display:flex' + I + ';align-items:center;justify-content:center;font-size:0' + I + '}',
       '@media (prefers-reduced-motion:reduce){.hmg-pbtn,.hmg-ic,.hmg-pulse4,.hmg-sheet,.hmg-spin{animation:none' + I + '}}'
     ];
     // تحسين النافذة (89): اللمس 44، والتباين، والتركيز، والمختار بعلامة. كل القواعد داخل .hmg-ov وبـ !important
@@ -529,7 +530,8 @@
     tt.id = 'hmg-tt' + (++ovN);
     tt.setAttribute('tabindex', '-1');
     sh.setAttribute('aria-labelledby', tt.id);
-    var x = btn('hmg-x', '×');
+    var x = btn('hmg-x', '');
+    x.innerHTML = '<svg width="16" height="16" viewBox="0 0 14 14" aria-hidden="true" style="display:block;margin:auto"><path d="M2 2L12 12M12 2L2 12" stroke="' + C1 + '" stroke-width="2" stroke-linecap="round"/></svg>';
     x.setAttribute('aria-label', 'إغلاق');
     add(head, back, tt, x);
     var prog = h('div', 'hmg-prog');
@@ -1456,30 +1458,48 @@
         lsSet('hm_gift_redir', {c: code, ts: Date.now()});
         location.replace('/#hadiya-complete');
       };
-      ov.onClose = function () { if (!gone) thankBar(); };
+      ov.onClose = function () { if (!gone) thankCards(code); };
       // ننتظر اكتمال الصفحة ثم ثانية ونصفاً حتى تسجّل أكواد الإعلانات الشراء
       var after = function () { setTimeout(go, Math.max(0, Math.min(1500, 6000 - (Date.now() - t0)))); };
       if (document.readyState === 'complete') after(); else window.addEventListener('load', after);
       setTimeout(go, 6000);
       return;
     }
-    thankBar();
+    thankCards(code);
   }
 
-  function thankBar() {
-    css();
-    var bar = h('div', 'hmg-tbar');
-    var a = document.createElement('a');
-    a.href = '/#hadiya-complete';
-    a.appendChild(h('span', '', 'أهدِ أجر تبرعك لمن تحب'));
-    a.insertAdjacentHTML('afterbegin', ICON);
-    var x = btn('', '×');
-    x.setAttribute('aria-label', 'إغلاق');
-    var closed = false;
-    x.addEventListener('click', function () { closed = true; clearInterval(t); if (bar.parentNode) bar.parentNode.removeChild(bar); });
-    add(bar, a, x);
-    document.documentElement.appendChild(bar);
-    var t = setInterval(function () { if (!closed && !bar.parentNode) document.documentElement.appendChild(bar); }, 400);
+  /* HM-THANKS (2026-11-25، معتمد 148c): بدل الشريط الثابت، بطاقتان داخل صفحة الشكر الأولى فقط تحت بطاقة الإيصال:
+     الإهداء (إلا لمن أهدى قبل الدفع) ثم قناة هامة في واتساب. لا تظهر في الفاتورة ولا لتبرع غير مدفوع. */
+  function thankCards(code) {
+    if (!/^\/order-completed\//.test(location.pathname)) return;
+    var tries = 0;
+    (function place() {
+      if (document.querySelector('.hmg-thx,.hmg-chn')) return;
+      var after = document.querySelector('.hmr-card');
+      if (!after) { if (++tries < 60) setTimeout(place, 250); return; }
+      var gifted = /أكمل إرسال هديتك|أرسل البطاقة/.test(after.textContent || '');
+      if (!document.getElementById('hmg-thx-css')) {
+        var s = document.createElement('style'); s.id = 'hmg-thx-css';
+        s.textContent = '.hmg-thx{direction:rtl;text-align:center;background:#fff;border:1px solid #E3ECE7;border-radius:16px;padding:16px;margin:0 0 14px;font-family:inherit}' +
+          '.hmg-thx p{margin:10px 0 0;font-size:15px;color:#5b6b80}' +
+          '.hmg-chn{display:flex;gap:12px;align-items:center;direction:rtl;text-align:right;background:#F0F8F4;border:1px solid #DFF3E6;border-radius:16px;padding:14px;margin:0 0 14px;text-decoration:none!important;font-family:inherit}' +
+          '.hmg-chn-i{flex:none;width:42px;height:42px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center}' +
+          '.hmg-chn-t{flex:1;min-width:0}.hmg-chn-t b{display:block;font-size:15px;font-weight:700;color:#126762}.hmg-chn-t span{display:block;font-size:14px;color:#5b6b80}' +
+          '.hmg-chn-b{flex:none;height:38px;padding:0 14px;border-radius:19px;background:#126762;color:#fff!important;font-size:14px;font-weight:700;display:flex;align-items:center}' +
+          '.hmg-thx button{display:block;width:100%;height:46px;border-radius:12px;border:2px solid #126762;background:#fff;color:#126762;font:inherit;font-size:16px;font-weight:700;cursor:pointer}';
+        document.head.appendChild(s);
+      }
+      if (!gifted) {
+        var c = h('div', 'hmg-thx'), b = btn('', '🎁 أهدِ أجر تبرعك لمن تحب', function () { complete(); });
+        add(c, b, h('p', '', 'اكتب اسم من تحب على بطاقة جاهزة، وأرسلها له.'));
+        after.parentNode.insertBefore(c, after.nextSibling); after = c;
+      }
+      var ch = h('a', 'hmg-chn'); ch.href = 'https://whatsapp.com/channel/0029Vb9j9eQ9mrGjVOVI6l0B'; ch.target = '_blank'; ch.rel = 'noopener';
+      ch.innerHTML = '<span class="hmg-chn-i"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#A8864A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11v2a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z"/><path d="M15 9a4 4 0 0 1 0 6"/><path d="M18 6a8 8 0 0 1 0 12"/></svg></span>';
+      var tx = h('span', 'hmg-chn-t'); add(tx, h('b', '', 'تابع أخبار مشاريعنا وأثر تبرعك'), h('span', '', 'على قناة هامة في واتساب'));
+      add(ch, tx, h('span', 'hmg-chn-b', 'تابِع'));
+      after.parentNode.insertBefore(ch, after.nextSibling);
+    })();
   }
 
   /* ======================= أكمل هديتك ======================= */
@@ -2121,6 +2141,8 @@
       if (window.console) console.warn('hmg', e);
     }
   }
+
+  window.HMGift = {complete: function () { complete(); }};   /* HM-RECEIPT: يفتح «أكمل هديتك» من بطاقة الإيصال */
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 })();
