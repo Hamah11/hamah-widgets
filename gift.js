@@ -238,7 +238,7 @@
     o.dSet = !!s.dSet;
     if (OCC[o.o].dead) o.d = MOURN;
     else if (o.d === MOURN) o.d = OCC[o.o].d;
-    o.th = s.th === 1 ? 1 : 0;
+    o.th = s.th === 0 ? 0 : 1;
     o.femSet = !!s.femSet;
     o.fem = !!s.fem && hasFem(o.o);
     o.anon = !!s.anon;
@@ -448,6 +448,7 @@
       '.hmg-ov .hmg-pv62{width:62%;margin:0 auto}',
       '.hmg-ov .hmg-small{color:#5b6b80}',
       '.hmg-ov .hmg-link{display:flex;width:fit-content;max-width:100%;margin-inline:auto;min-height:44px;align-items:center;justify-content:center;padding:0 4px;color:' + C1 + ';text-decoration:underline;text-decoration-color:' + C2D + ';text-decoration-thickness:2px;text-underline-offset:4px}',
+      '.hmg-ov .hmg-link.hmg-lk{text-decoration:none!important}',
       '.hmg-ov .hmg-more{width:100%;height:48px;margin:12px 0 0;border:0;border-radius:12px;background:#F0F8F4;color:' + C1 + ';font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 12px;cursor:pointer;box-shadow:none;text-decoration:none}',
       '.hmg-ov .hmg-chk{min-height:44px;margin:4px 0 0}',
       '.hmg-ov .hmg-chk input{width:22px;height:22px;flex:0 0 22px;-webkit-appearance:none;appearance:none;border:2px solid ' + C1 + ';border-radius:5px;background:#fff;cursor:pointer}',
@@ -1172,6 +1173,13 @@
       var pw = h('div', 'hmg-pv62');
       pw.appendChild(pv);
       w.appendChild(pw);
+      var lk2 = btn('hmg-link hmg-lk', showDesign ? 'إخفاء ▴' : 'غيّر الشكل ▾', function () { showDesign = !showDesign; render(true); });
+      lk2.setAttribute('aria-expanded', showDesign ? 'true' : 'false');
+      w.appendChild(lk2);
+      if (showDesign) {
+        if (dead) themeSeg(w);
+        else lookPicker(w);
+      }
 
       var b = btn('hmg-pri', opts.withAmount ? 'التالي: المبلغ' : (opts.doneText || 'التالي'));
       var sb = stickyBar(b);
@@ -1209,8 +1217,36 @@
         var e = nameErr(st);
         if (e) { fieldErr(e.f === 'to' ? inTo : inFrom, e.m); return; }
         st.ns = autoNs(st.to);
-        if (opts.withAmount) { saveState(st); go(3); } else opts.onDone(st, sb);
+        if (opts.withAmount) { saveState(st); showDesign = false; go(3); } else opts.onDone(st, sb);
       });
+    }
+
+    function keepSt() { if (opts.withAmount) saveState(st); }
+    // التصاميم بلا تصميم المتوفى، ثم فاتحة/غامقة
+    function lookPicker(w) {
+      var row = h('div', 'hmg-designs');
+      DS.forEach(function (d, i) {
+        if (i === MOURN) return;
+        var z = btn('hmg-dz' + (st.d === i ? ' on' : ''), null, function () {
+          st.d = i; st.dSet = true; keepSt(); render(true);
+        });
+        var im = h('img');
+        im.src = IMG + d.k + '-' + (st.th === 1 ? 'l' : 'd') + '.jpg';
+        im.alt = '';
+        im.loading = 'lazy';
+        add(z, im, h('span', '', d.l));
+        row.appendChild(z);
+      });
+      w.appendChild(row);
+      themeSeg(w);
+    }
+    // «فاتحة» أولاً (يمين) لأنها التلقائية
+    function themeSeg(w) {
+      var two = h('div', 'hmg-two');
+      [[1, '☀️ فاتحة'], [0, '🌙 غامقة']].forEach(function (x) {
+        two.appendChild(btn('hmg-opt' + (st.th === x[0] ? ' on' : ''), x[1], function () { st.th = x[0]; keepSt(); render(true); }));
+      });
+      w.appendChild(two);
     }
 
     function s3() {
@@ -1277,7 +1313,7 @@
       ci.alt = '';
       var ct = h('div', 'hmg-crt');
       add(ct, h('b', '', 'بطاقتك'), h('span', '', (dead ? 'عن ' : 'إلى ') + st.to));
-      var cl = btn('hmg-link', showDesign ? 'إخفاء ▴' : 'غيّر الشكل', function () { showDesign = !showDesign; render(true); });
+      var cl = btn('hmg-link hmg-lk', showDesign ? 'إخفاء ▴' : 'غيّر الشكل', function () { showDesign = !showDesign; render(true); });
       cl.setAttribute('aria-expanded', showDesign ? 'true' : 'false');
       add(crow, ci, ct, cl);
       w.appendChild(crow);
@@ -1285,31 +1321,11 @@
         var pv = preview(st, 'شكل تقريبي، والبطاقة النهائية بعد التبرع');
         pv.style.marginTop = '10px';
         w.appendChild(pv);
-        if (!dead) {
-          var row = h('div', 'hmg-designs');
-          DS.forEach(function (d, i) {
-            if (i === MOURN) return;
-            var z = btn('hmg-dz' + (st.d === i ? ' on' : ''), null, function () {
-              st.d = i; st.dSet = true; saveState(st); render(true);
-            });
-            var im = h('img');
-            im.src = IMG + d.k + '-' + (st.th === 1 ? 'l' : 'd') + '.jpg';
-            im.alt = '';
-            im.loading = 'lazy';
-            add(z, im, h('span', '', d.l));
-            row.appendChild(z);
-          });
-          w.appendChild(row);
-          var two = h('div', 'hmg-two');
-          add(two,
-            btn('hmg-opt' + (st.th === 0 ? ' on' : ''), '🌙 غامقة', function () { st.th = 0; saveState(st); render(true); }),
-            btn('hmg-opt' + (st.th === 1 ? ' on' : ''), '☀️ فاتحة', function () { st.th = 1; saveState(st); render(true); }));
-          w.appendChild(two);
-        }
+        if (!dead) lookPicker(w);
       }
       if (dead) {
         var mrow = h('div', 'hmg-mourn');
-        [0, 1].forEach(function (t) {
+        [1, 0].forEach(function (t) {
           var mz = btn('hmg-mz' + (st.th === t ? ' on' : ''), null, function () { st.th = t; saveState(st); render(true); });
           var mi = h('img');
           mi.src = IMG + 'mourn-' + (t === 1 ? 'l' : 'd') + '.jpg';
