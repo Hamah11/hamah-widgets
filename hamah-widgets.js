@@ -730,3 +730,40 @@
     window.addEventListener('hashchange', set);
   } catch (e) {}
 })();
+
+/* ============================================================
+   HM-SITENAME (2026-11-26) — اسم الموقع لقوقل + تصحيح شعار المنظمة، للصفحة الرئيسية فقط
+   يضيف بيانات WebSite (الاسم الكامل + أسماء بديلة بلا كلمة «متجر») ويصحّح شعار Organization الذي يضعه زد.
+   للإلغاء: احذف هذا الجزء.
+   ============================================================ */
+(function(){
+  try {
+    if (location.pathname !== '/' && location.pathname !== '') return;
+    var LOGO = 'https://media.zid.store/a2fcf162-43b5-476a-bdf9-09216baee072/dab64269-9328-4c6e-9146-9ce41157ce99.png';
+    if (!document.getElementById('hm-website-ld')) {
+      var s = document.createElement('script');
+      s.type = 'application/ld+json';
+      s.id = 'hm-website-ld';
+      s.textContent = JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "@id": "https://hamh.sa/#website",
+        "name": "جمعية هامة لخدمة الحجاج والمعتمرين",
+        "alternateName": ["جمعية هامة", "هامة لخدمة الحجاج والمعتمرين", "هامة", "hamh.sa"],
+        "url": "https://hamh.sa/",
+        "inLanguage": "ar"
+      });
+      document.head.appendChild(s);
+    }
+    var ss = document.querySelectorAll('script[type="application/ld+json"]');
+    for (var i = 0; i < ss.length; i++) {
+      var d;
+      try { d = JSON.parse(ss[i].textContent); } catch (e) { continue; }
+      if (d && d['@type'] === 'Organization') {
+        d.logo = LOGO;
+        d.alternateName = ["جمعية هامة لخدمة الحجاج والمعتمرين", "جمعية هامة"];
+        ss[i].textContent = JSON.stringify(d);
+      }
+    }
+  } catch (e) {}
+})();
