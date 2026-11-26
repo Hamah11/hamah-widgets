@@ -1492,8 +1492,13 @@
     (function place() {
       if (document.querySelector('.hmg-thx,.hmg-chn')) return;
       var after = document.querySelector('.hmr-card');
-      if (!after) { if (++tries < 60) setTimeout(place, 250); return; }
-      var gifted = /أكمل إرسال هديتك|أرسل البطاقة/.test(after.textContent || '');
+      if (!after || after.getAttribute('data-gift') === 'wait') {   /* ننتظر ردّ قوقل (data-gift) حتى 30 ث */
+        if (++tries < 120) { setTimeout(place, 250); return; }
+        if (!after) { var h1 = document.querySelector('.order-completed-content h1'); after = h1 && (h1.closest('.d-flex') || h1); }
+        if (!after) return;
+        var onlyChannel = true;                                     /* انتهت المدة: القناة فقط، لا نعرض الإهداء على من قد يكون أهدى */
+      }
+      var gifted = onlyChannel || after.getAttribute('data-gift') === 'yes' || /أكمل إرسال هديتك|أرسل البطاقة/.test(after.textContent || '');
       if (!document.getElementById('hmg-thx-css')) {
         var s = document.createElement('style'); s.id = 'hmg-thx-css';
         s.textContent = '.hmg-thx{direction:rtl;text-align:center;background:#fff;border:1px solid #E3ECE7;border-radius:16px;padding:16px;margin:0 0 14px;font-family:inherit}' +

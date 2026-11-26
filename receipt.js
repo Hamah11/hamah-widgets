@@ -1,5 +1,5 @@
 /* ============================================================
-   HM-RECEIPT v2 (سريع) — «تحميل الإيصال» + صفحة التحقق (جمعية هامة) — 2026-11-25
+   HM-RECEIPT v2.2 (سريع، والشكر فوراً) — «تحميل الإيصال» + صفحة التحقق (جمعية هامة) — 2026-11-25
    يعمل في صفحات: /o/<رمز>/inv و /order-completed/<رمز>/invoice و /orders/<رمز>/invoice
    وأي صفحة + #receipt=XXXX-XXXX (صفحة التحقق) و /account-orders («طلباتي وإيصالاتي»)
    السكربت: «إيصالات هامة» (يتأكد من الدفع ويعطي البيانات فقط). الرسم هنا في المتصفح بالتصميم المعتمد (148b).
@@ -360,7 +360,7 @@
   function card(order) {
     var tries = 0, thank = /^\/order-completed\//.test(location.pathname);
     var gR = getReceipt(order);                         /* نبدأ نداء قوقل فوراً، والبطاقة لا تنتظره */
-    var zP = thank ? null : fetch('/api/v1/orders/' + order + '/invoice', {headers: {Accept: 'application/json'}})
+    var zP = fetch('/api/v1/orders/' + order + '/invoice', {headers: {Accept: 'application/json'}})   /* زد يعرف حالة الدفع أسرع من قوقل */
       .then(function (r) { return r.json(); })
       .then(function (j) { var od = j && (j.order || (j.data && j.data.order)); return !!od && String(od.payment_status || '').toLowerCase() === 'paid'; })
       .catch(function () { return false; });
@@ -382,20 +382,26 @@
         gl.style.marginInlineStart = '16px'; gl.onclick = function () { window.HMGift.complete(order); }; cd.appendChild(gl);
       }
     }
+    /* data-gift على البطاقة: wait حتى يردّ قوقل، ثم yes أو no (يقرؤها gift.js في صفحة الشكر) */
+    function settle(cd, d) {
+      if (!cd || !cd.isConnected) return;
+      if (d && d.ok) extras(cd, d);
+      cd.setAttribute('data-gift', d && d.ok && d.gift && d.gift.to ? 'yes' : 'no');
+    }
     (function place() {
       var title = document.querySelector('main.content-container .page-title') || document.querySelector('.z-order-invoice-view .page-title');
       if (!title) { var h1 = document.querySelector('.order-completed-content h1'); if (h1) title = h1.closest('.d-flex') || h1; }   /* صفحة الشكر بعد الدفع */
       if (!title) { if (++tries < 40) setTimeout(place, 250); return; }
       if (document.querySelector('.hmr-card')) return;
-      if (thank) {                                       /* صفحة الشكر الأولى: كما كانت (تنتظر قوقل) */
-        gR.then(function (d) { if (!d || !d.ok) return; var cd = build(title); if (cd) { extras(cd, d); loadAssets(); } }).catch(function () {});
-        return;
-      }
       zP.then(function (paid) {
-        if (!paid) return;                               /* غير مدفوع حسب زد: لا شيء */
-        var cd = build(title); if (!cd) return;
-        loadAssets();
-        gR.then(function (d) { if (d && d.ok && cd.isConnected) extras(cd, d); }).catch(function () {});
+        if (paid) {                                      /* مدفوع حسب زد: البطاقة فوراً */
+          var cd = build(title); if (!cd) return;
+          cd.setAttribute('data-gift', 'wait');
+          loadAssets();
+          gR.then(function (d) { settle(cd, d); }, function () { settle(cd, null); });
+        } else if (thank) {                              /* صفحة الشكر وزد لم يؤكد بعد: ننتظر قوقل كما كان */
+          gR.then(function (d) { if (!d || !d.ok) return; var cd = build(title); if (cd) { settle(cd, d); loadAssets(); } }).catch(function () {});
+        }                                                /* غيرها وغير مدفوع: لا شيء */
       });
     })();
   }
