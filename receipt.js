@@ -310,7 +310,7 @@
   function getReceipt(order) {
     if (!cache[order]) {
       cache[order] = post({a: 'receipt', o: order});
-      cache[order].catch(function () { delete cache[order]; });
+      cache[order].then(function (d) { if (!d || !d.ok) delete cache[order]; }, function () { delete cache[order]; });   /* لا نحفظ الرد الفاشل */
     }
     return cache[order];
   }
