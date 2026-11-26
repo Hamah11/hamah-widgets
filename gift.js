@@ -448,7 +448,7 @@
       '.hmg-ov .hmg-pv62{width:62%;margin:0 auto}',
       '.hmg-ov .hmg-small{color:#5b6b80}',
       '.hmg-ov .hmg-link{display:flex;width:fit-content;max-width:100%;margin-inline:auto;min-height:44px;align-items:center;justify-content:center;padding:0 4px;color:' + C1 + ';text-decoration:underline;text-decoration-color:' + C2D + ';text-decoration-thickness:2px;text-underline-offset:4px}',
-      '.hmg-ov .hmg-link.hmg-lk{text-decoration:none!important}',
+      '.hmg-ov .hmg-link.hmg-lk{text-decoration:none}',
       '.hmg-ov .hmg-more{width:100%;height:48px;margin:12px 0 0;border:0;border-radius:12px;background:#F0F8F4;color:' + C1 + ';font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 12px;cursor:pointer;box-shadow:none;text-decoration:none}',
       '.hmg-ov .hmg-chk{min-height:44px;margin:4px 0 0}',
       '.hmg-ov .hmg-chk input{width:22px;height:22px;flex:0 0 22px;-webkit-appearance:none;appearance:none;border:2px solid ' + C1 + ';border-radius:5px;background:#fff;cursor:pointer}',
