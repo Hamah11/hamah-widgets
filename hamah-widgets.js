@@ -5,6 +5,8 @@
    <script src="https://cdn.jsdelivr.net/gh/Hamah11/hamah-widgets@main/hamah-widgets.js" defer></script>
    بعد أي تعديل في GitHub: افتح https://purge.jsdelivr.net/gh/Hamah11/hamah-widgets@main/hamah-widgets.js مرة واحدة لتحديث النسخة.
    ============================================================ */
+/* HM-FAVICON-LARGE 2026-11-27: زد تحفظ أيقونة المتجر 32px فقط فتظهر باهتة في قوقل؛ نضيف رابط أيقونة 512px شفافة (نفس ألوان الشعار) أول <head> ونوجّه روابط icon إليها (أيقونة الآيفون تبقى كما هي). للتراجع: احذف هذا السطر أو ارجع للإصدار السابق. */
+(function(){try{var U='https://cdn.jsdelivr.net/gh/Hamah11/hamah-widgets@2516ec5b4ff4d8f4d6dda4b1800efb287c2c3eee/img/favicon-512.png',d=document,h=d.head;if(!h||h.querySelector('link[data-hamah-icon]'))return;h.querySelectorAll('link[rel~="icon"]').forEach(function(l){l.href=U;});var n=d.createElement('link');n.rel='icon';n.type='image/png';n.setAttribute('sizes','512x512');n.href=U;n.setAttribute('data-hamah-icon','1');h.insertBefore(n,h.firstChild);}catch(e){}})();
 /* HM-BLOGS-REDIRECT 2026-11-16: صفحة /blogs (قائمة المقالات) فارغة، فتُحوَّل إلى الرئيسية. صفحات /blogs/<اسم> لا تتأثر. */
 (function(){try{if(/^\/(ar\/)?blogs\/?$/.test(location.pathname))location.replace('/');}catch(e){}})();
 (function () {
